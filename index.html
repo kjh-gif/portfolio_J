@@ -10,14 +10,84 @@
 <body>
   <!-- 헤더 영역 -->
   <header>
+    <div class="header-container">
+      <a href="index.html" class="logo">Portfolio</a>
+      <nav>
+        <a href="#home">Home</a>
+        <a href="board.html">Work</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
   </header>
 
   <!-- 메인 컨텐츠 -->
   <main>
+    <!-- Hero 섹션 -->
+    <section id="home" class="hero-section">
+      <h1>UI/UX Designer<br>Portfolio</h1>
+      <p>사용자 경험을 중심으로 설계하는<br>웹 디자이너입니다.</p>
+      <a href="#work" class="cta-button">작업물 보기</a>
+    </section>
+
+    <!-- Work 섹션 -->
+    <section id="work" class="work-section">
+      <h2>Work</h2>
+      <p>다양한 프로젝트를 통해 사용자 중심의 디자인을 구현합니다.</p>
+
+      <div class="work-grid">
+        <!-- 샘플 작업물 카드 1 -->
+        <div class="work-card">
+          <img src="img/work-sample-1.jpg" alt="프로젝트 1" onerror="this.style.backgroundColor='#DCD3CD'; this.style.height='250px';">
+          <div class="work-card-content">
+            <h3>프로젝트 제목 1</h3>
+            <p>프로젝트에 대한 간단한 설명이 들어갑니다. UX 목표와 주요 기능을 소개합니다.</p>
+          </div>
+        </div>
+
+        <!-- 샘플 작업물 카드 2 -->
+        <div class="work-card">
+          <img src="img/work-sample-2.jpg" alt="프로젝트 2" onerror="this.style.backgroundColor='#DCD3CD'; this.style.height='250px';">
+          <div class="work-card-content">
+            <h3>프로젝트 제목 2</h3>
+            <p>프로젝트에 대한 간단한 설명이 들어갑니다. UX 목표와 주요 기능을 소개합니다.</p>
+          </div>
+        </div>
+
+        <!-- 샘플 작업물 카드 3 -->
+        <div class="work-card">
+          <img src="img/work-sample-3.jpg" alt="프로젝트 3" onerror="this.style.backgroundColor='#DCD3CD'; this.style.height='250px';">
+          <div class="work-card-content">
+            <h3>프로젝트 제목 3</h3>
+            <p>프로젝트에 대한 간단한 설명이 들어갑니다. UX 목표와 주요 기능을 소개합니다.</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: 48px;">
+        <a href="board.html" class="cta-button">더 많은 작업물 보기</a>
+      </div>
+    </section>
+
+    <!-- Contact 섹션 -->
+    <section id="contact" class="contact-section">
+      <h2>Contact</h2>
+      <div class="contact-content">
+        <p class="contact-info">
+          프로젝트 문의 및 협업 제안을 환영합니다.<br>
+          아래 이메일로 연락 주세요.
+        </p>
+        <p class="contact-info">
+          Email: <a href="mailto:your.email@example.com">your.email@example.com</a>
+        </p>
+      </div>
+    </section>
   </main>
 
   <!-- 바닥글 영역 -->
   <footer>
+    <div class="footer-container">
+      <p>&copy; 2024 Portfolio. All rights reserved.</p>
+    </div>
   </footer>
 
   <script src="js/main.js"></script>
