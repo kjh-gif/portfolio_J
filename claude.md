@@ -138,12 +138,12 @@
 **배포 (호스팅)**
 - Vercel - 무료로 웹사이트 배포
 
-## 1단계: Supabase 기본 설정 
-- [ ] Supabase 계정 생성(수동 작업)
-- [ ] 새 프로젝트 생성(수동 작업)
-- [ ] Database URL, API Key 복사(수동 작업)
-- [ ] 클로드코드에게 URL과 Key 알려주고 .env.local 파일 만들기 요청
-- [ ] 클로드코드에게  .gitignore 에 .env.local 포함되어있는지 확인
+## 1단계: Supabase 기본 설정
+- [x] Supabase 계정 생성(수동 작업)
+- [x] 새 프로젝트 생성(수동 작업)
+- [x] Database URL, API Key 복사(수동 작업)
+- [x] 클로드코드에게 URL과 Key 알려주고 .env.local 파일 만들기 요청
+- [x] 클로드코드에게  .gitignore 에 .env.local 포함되어있는지 확인
 
 ## 2단계: 로그인 기능 구현 (클로드코드 작업)
 - [ ] Supabase 이메일 관리자만 접근 가능한 로그인/회원가입 기능 구현
