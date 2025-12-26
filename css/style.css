@@ -34,7 +34,7 @@
   --spacing-xl: 80px;
 
   /* 레이아웃 */
-  --max-width: 1200px;
+  --max-width: 1600px;
   --header-height: 80px;
 }
 
@@ -164,18 +164,15 @@ section {
 /* Hero 섹션 */
 .hero-section {
   min-height: 400px;
-  max-width: 100%;
-  padding-left: var(--spacing-xl);
-  padding-right: var(--spacing-xl);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
+  width: 100%;
   background-image: url('../img/hero-bg.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .hero-section::before {
@@ -189,11 +186,15 @@ section {
   z-index: 1;
 }
 
-.hero-section h1,
-.hero-section p,
-.hero-section .cta-button {
+.hero-content {
+  max-width: var(--max-width);
+  width: 100%;
+  padding: var(--spacing-xl) var(--spacing-md);
   position: relative;
   z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .hero-section h1 {
@@ -394,9 +395,11 @@ footer p {
   }
 
   .hero-section {
-    padding-left: var(--spacing-sm);
-    padding-right: var(--spacing-sm);
     min-height: 350px;
+  }
+
+  .hero-content {
+    padding: var(--spacing-lg) var(--spacing-sm);
   }
 
   .hero-section h1 {
