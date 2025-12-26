@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio | Work</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- 헤더 영역 -->
+  <header>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="board.html">Work</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <div class="admin-controls">
+      <button id="logoutBtn" class="btn-logout" style="display:none;">로그아웃</button>
+    </div>
+  </header>
+
+  <!-- 메인 컨텐츠 -->
+  <main class="board-container">
+    <section class="board-header">
+      <h1>Work</h1>
+
+      <!-- 검색 영역 -->
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="제목으로 검색">
+        <button id="searchBtn">검색</button>
+      </div>
+
+      <!-- 관리자 전용: 글쓰기 버튼 -->
+      <button id="writeBtn" class="btn-write" style="display:none;">글쓰기</button>
+    </section>
+
+    <!-- 게시글 목록 (카드 형식) -->
+    <section class="post-grid" id="postGrid">
+      <!-- 게시글 카드들이 여기에 동적으로 추가됩니다 -->
+    </section>
+
+    <!-- 글쓰기/수정 모달 -->
+    <div id="postModal" class="modal" style="display:none;">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 id="modalTitle">새 글 작성</h2>
+
+        <form id="postForm">
+          <div class="form-group">
+            <label for="postTitle">제목</label>
+            <input type="text" id="postTitle" required>
+          </div>
+
+          <div class="form-group">
+            <label for="postContent">내용</label>
+            <textarea id="postContent" rows="10" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="postImage">이미지</label>
+            <input type="file" id="postImage" accept="image/*">
+            <div id="imagePreview"></div>
+          </div>
+
+          <div class="modal-buttons">
+            <button type="submit" class="btn-submit">저장</button>
+            <button type="button" class="btn-cancel">취소</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- 바닥글 -->
+  <footer>
+  </footer>
+
+  <script src="js/board.js"></script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+# 환경 변수 파일
+.env
+.env.local
+.env*.local
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# 에디터
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 로그 파일
+*.log
+npm-debug.log*
+
+# 의존성 디렉토리
+node_modules/
+
+# 빌드 결과물
+dist/
+build/
+
+# 임시 파일
+*.tmp
+.cache/
