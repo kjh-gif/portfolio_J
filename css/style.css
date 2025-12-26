@@ -549,6 +549,7 @@ footer p {
   gap: var(--spacing-sm);
 }
 
+.btn-login-link,
 .btn-logout,
 .btn-write,
 .btn-cancel,
@@ -558,6 +559,18 @@ footer p {
   font-weight: var(--font-weight-bold);
   border-radius: 6px;
   transition: all 0.3s ease;
+}
+
+.btn-login-link {
+  background-color: var(--color-point);
+  color: #ffffff;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-login-link:hover {
+  background-color: #2a2a2a;
+  transform: translateY(-1px);
 }
 
 .btn-logout {

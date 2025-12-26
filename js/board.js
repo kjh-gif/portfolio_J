@@ -9,21 +9,24 @@ document.addEventListener('DOMContentLoaded', async function() {
   const user = await getCurrentUser();
 
   // UI 요소
+  const loginLink = document.getElementById('loginLink');
   const logoutBtn = document.getElementById('logoutBtn');
   const writeBtn = document.getElementById('writeBtn');
 
   // 관리자 로그인 상태에 따른 UI 표시
   if (isLoggedIn && user) {
-    // 로그인 상태: 로그아웃 버튼 표시
-    logoutBtn.style.display = 'block';
+    // 로그인 상태
+    if (loginLink) loginLink.style.display = 'none';
+    if (logoutBtn) logoutBtn.style.display = 'block';
 
     // 글쓰기 버튼 표시 (관리자만)
     if (writeBtn) {
       writeBtn.style.display = 'block';
     }
   } else {
-    // 비로그인 상태: 버튼 숨기기
-    logoutBtn.style.display = 'none';
+    // 비로그인 상태
+    if (loginLink) loginLink.style.display = 'block';
+    if (logoutBtn) logoutBtn.style.display = 'none';
     if (writeBtn) {
       writeBtn.style.display = 'none';
     }

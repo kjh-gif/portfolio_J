@@ -18,6 +18,10 @@
           <a href="board.html">Work</a>
           <a href="#contact">Contact</a>
         </nav>
+        <div class="admin-controls">
+          <a href="login.html" id="loginLink" class="btn-login-link" style="display:none;">로그인</a>
+          <button id="logoutBtn" class="btn-logout" style="display:none;">로그아웃</button>
+        </div>
       </div>
     </div>
   </header>
@@ -94,6 +98,14 @@
     </div>
   </footer>
 
+  <!-- Supabase JavaScript 라이브러리 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- 설정 파일 및 Supabase 클라이언트 -->
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+
+  <!-- 메인 페이지 스크립트 -->
   <script src="js/main.js"></script>
 </body>
 </html>
