@@ -150,26 +150,26 @@
 - [x] 로그인 상태 관리
 - [x] 로그인/로그아웃 UI
 
-## 3단계: 게시판 데이터베이스 설정 
+## 3단계: 게시판 데이터베이스 설정
 
 ### posts 테이블 설정
-- [ ] 테이블 생성 SQL구문 요청
-- [ ] Supabase 대시보드에서 테이블 생성하기(수동작업)
-- [ ] posts 테이블 보안정책(RLS) SQL 구문 요청
-- [ ] posts 테이블 RLS 정책 실행
-- [ ] posts 테이블 RLS 활성화 확인
+- [x] 테이블 생성 SQL구문 요청
+- [x] Supabase 대시보드에서 테이블 생성하기(수동작업)
+- [x] posts 테이블 보안정책(RLS) SQL 구문 요청
+- [x] posts 테이블 RLS 정책 실행
+- [x] posts 테이블 RLS 활성화 확인
 
 ### Storage 설정
-- [ ] 이미지 저장소(post-images 버킷) 만들기(수동작업)
-- [ ] Storage 보안정책 설정 (수동작업)
-  - [ ] 누구나 이미지 조회 가능 (SELECT)
-  - [ ] 로그인한 관리자만 사용자만 업로드 (INSERT)
-  - [ ] 관리자만 이미지 삭제 (DELETE)
-  - [ ] 관리자만 이미지 수정 (UPDATE)
+- [x] 이미지 저장소(post-images 버킷) 만들기(수동작업)
+- [x] Storage 보안정책 설정 (수동작업)
+  - [x] 누구나 이미지 조회 가능 (SELECT)
+  - [x] 로그인한 관리자만 사용자만 업로드 (INSERT)
+  - [x] 관리자만 이미지 삭제 (DELETE)
+  - [x] 관리자만 이미지 수정 (UPDATE)
 
 **posts 테이블 보안 정책 확인
-- [ ] posts 테이블에 🔒 자물쇠 표시가 있나요?
-- [ ] RLS 정책이 4개(SELECT, INSERT, UPDATE, DELETE) 모두 있나요?
+- [x] posts 테이블에 🔒 자물쇠 표시가 있나요?
+- [x] RLS 정책이 4개(SELECT, INSERT, UPDATE, DELETE) 모두 있나요?
 
 ## 4단계: 게시판 기본 CRUD 구현 (클로드코드 작업)
 - [ ] 게시글 목록 조회 (Read) - 게시판 메인 페이지
