@@ -323,7 +323,7 @@ section {
 }
 
 .contact-section h2 {
-  font-size: 44px;
+  font-size: 24px;
   font-weight: var(--font-weight-bold);
   color: var(--color-point);
   margin-bottom: var(--spacing-lg);
@@ -418,7 +418,7 @@ footer p {
 
   .work-section h2,
   .contact-section h2 {
-    font-size: 36px;
+    font-size: 24px;
   }
 }
 
@@ -467,7 +467,7 @@ footer p {
 
   .work-section h2,
   .contact-section h2 {
-    font-size: 28px;
+    font-size: 20px;
   }
 
   .contact-description {
