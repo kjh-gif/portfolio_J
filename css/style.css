@@ -248,7 +248,7 @@ section {
 }
 
 .work-section h2 {
-  font-size: 44px;
+  font-size: 24px;
   font-weight: var(--font-weight-bold);
   color: var(--color-point);
   margin-bottom: var(--spacing-lg);
