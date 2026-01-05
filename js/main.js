@@ -295,7 +295,7 @@ async function openDetailModal(postId) {
 
   // 3. 로딩 상태 표시
   detailTitle.textContent = '로딩 중...';
-  detailImages.innerHTML = '';
+  detailImages.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">이미지를 불러오는 중...</div>';
   detailContent.textContent = '';
 
   try {
@@ -323,7 +323,7 @@ async function openDetailModal(postId) {
     // 4. 데이터로 내용 채우기
     detailTitle.textContent = post.title;
 
-    // 이미지들 표시 (위에서 아래로)
+    // 이미지들 표시 (위에서 아래로) - 프리로딩으로 최적화
     if (post.image_url) {
       let imageUrls = [];
       if (typeof post.image_url === 'string') {
@@ -336,15 +336,29 @@ async function openDetailModal(postId) {
         imageUrls = post.image_url;
       }
 
-      imageUrls.forEach(url => {
-        const img = document.createElement('img');
-        img.src = url;
-        img.alt = post.title;
-        img.style.width = '100%';
-        img.style.marginBottom = '8px';
-        img.style.borderRadius = '8px';
-        detailImages.appendChild(img);
+      // 모든 이미지 프리로딩 (태블릿 성능 개선)
+      const imagePromises = imageUrls.map(url => {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = () => resolve(img); // 에러여도 계속 진행
+          img.src = url;
+          img.alt = post.title;
+          img.style.width = '100%';
+          img.style.marginBottom = '8px';
+          img.style.borderRadius = '8px';
+        });
       });
+
+      // 모든 이미지 로드 완료 후 한 번에 DOM 추가
+      const loadedImages = await Promise.all(imagePromises);
+
+      // DocumentFragment로 한 번에 추가 (레이아웃 재계산 최소화)
+      const fragment = document.createDocumentFragment();
+      loadedImages.forEach(img => {
+        fragment.appendChild(img);
+      });
+      detailImages.appendChild(fragment);
     }
 
     // 내용 표시

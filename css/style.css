@@ -985,6 +985,20 @@ footer p {
   -webkit-transition: transform 0.2s ease;
   -o-transition: transform 0.2s ease;
   transition: transform 0.2s ease;
+  /* 태블릿 성능 최적화 */
+  will-change: transform;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 모달 이미지 최적화 */
+#detailImages img {
+  display: block;
+  height: auto;
+  /* GPU 가속 활성화 */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  /* 부드러운 렌더링 */
+  image-rendering: auto;
 }
 
 .modal.show .modal-content {
