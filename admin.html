@@ -3,7 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#EFE7E0">
   <title>Portfolio | Admin</title>
+
+  <!-- Preconnect to external domains -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+
+  <!-- Critical CSS -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -126,13 +132,13 @@
   </footer>
 
   <!-- Supabase JavaScript 라이브러리 -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 
   <!-- 설정 파일 및 Supabase 클라이언트 -->
-  <script src="js/config.js"></script>
-  <script src="js/supabase-client.js"></script>
+  <script src="js/config.js" defer></script>
+  <script src="js/supabase-client.js" defer></script>
 
   <!-- 관리자 페이지 스크립트 -->
-  <script src="js/admin.js"></script>
+  <script src="js/admin.js" defer></script>
 </body>
 </html>
