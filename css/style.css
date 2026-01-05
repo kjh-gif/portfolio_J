@@ -786,7 +786,7 @@ footer p {
 
 .post-card img {
   width: 100%;
-  height: 70%;
+  height: 60%;
   object-fit: cover;
   flex-shrink: 0;
 }
@@ -800,9 +800,9 @@ footer p {
 }
 
 .post-card h3 {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: var(--font-weight-bold);
-  color: var(--color-point);
+  color: #463C29;
   margin-bottom: 8px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -811,14 +811,16 @@ footer p {
   line-clamp: 2;
   -webkit-box-orient: vertical;
   word-break: break-word;
+  line-height: 1.4;
 }
 
 .post-card p {
-  font-size: 16px;
-  color: var(--color-text-light);
+  font-size: 14px;
+  color: #756A54;
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
