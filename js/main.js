@@ -28,8 +28,17 @@ document.addEventListener('DOMContentLoaded', async function() {
   // 게시글 목록 로드
   await loadWorkPosts();
 
+  // 게시글 렌더링 완료 대기 (워크 카드가 화면에 완전히 표시되도록)
+  await new Promise(resolve => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setTimeout(resolve, 50);
+      });
+    });
+  });
+
   // URL 해시 처리 (다른 페이지에서 이동 시)
-  // 게시글 로드 후 즉시 실행하여 정확한 위치 계산
+  // 게시글 완전 렌더링 후 실행하여 정확한 위치 계산
   await handleUrlHash();
 
   // 부드러운 스크롤 효과 (해시 처리 후 활성화)
