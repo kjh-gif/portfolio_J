@@ -42,16 +42,14 @@ function handleUrlHash() {
     const targetElement = document.getElementById(targetId);
 
     if (targetElement) {
-      // 페이지 로드 직후 스크롤이 제대로 작동하도록 약간 지연
-      setTimeout(() => {
-        const headerHeight = 80; // 헤더 높이
-        const targetPosition = targetElement.offsetTop - headerHeight;
+      // 즉시 스크롤로 중간 과정 없이 바로 이동
+      const headerHeight = 80; // 헤더 높이
+      const targetPosition = targetElement.offsetTop - headerHeight;
 
-        window.scrollTo({
-          top: targetPosition,
-          behavior: 'smooth'
-        });
-      }, 100);
+      window.scrollTo({
+        top: targetPosition,
+        behavior: 'auto' // smooth 대신 auto로 즉시 이동
+      });
     }
   }
 }
