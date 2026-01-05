@@ -121,48 +121,12 @@ function highlightNavigation() {
 highlightNavigation();
 
 // ==========================================
-// 로그인 상태에 따른 UI 업데이트
+// 로그인 상태 확인 (관리자 페이지용)
 // ==========================================
 async function updateAuthUI() {
-  const loginLink = document.getElementById('loginLink');
-  const logoutBtn = document.getElementById('logoutBtn');
-
   // 로그인 상태 확인 (전역 변수에 캐시 - 속도 개선)
   const isLoggedIn = await checkAuth();
   isUserLoggedIn = isLoggedIn; // 전역 변수에 저장
-
-  if (isLoggedIn) {
-    // 로그인 상태: 로그아웃 버튼 표시, 로그인 링크 숨김
-    if (loginLink) loginLink.style.display = 'none';
-    if (logoutBtn) logoutBtn.style.display = 'block';
-  } else {
-    // 비로그인 상태: 로그인 링크 표시, 로그아웃 버튼 숨김
-    if (loginLink) loginLink.style.display = 'block';
-    if (logoutBtn) logoutBtn.style.display = 'none';
-  }
-
-  // 로그아웃 버튼 이벤트
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', async function() {
-      try {
-        const { error } = await supabaseClient.auth.signOut();
-
-        if (error) {
-          console.error('Logout error:', error);
-          alert('로그아웃에 실패했습니다.');
-          return;
-        }
-
-        // 로그아웃 성공
-        alert('로그아웃되었습니다.');
-        window.location.reload();
-
-      } catch (err) {
-        console.error('Error:', err);
-        alert('오류가 발생했습니다.');
-      }
-    });
-  }
 }
 
 // ==========================================

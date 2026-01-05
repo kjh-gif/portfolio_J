@@ -4,7 +4,7 @@
 
 // 전역 변수
 let currentEditingPostId = null;
-let uploadedImageFiles = []; // 최대 3개까지
+let uploadedImageFiles = []; // 최대 3개까지 (File 객체 배열)
 let uploadedThumbnailFile = null; // 썸네일 이미지
 let cachedPosts = []; // 로드된 게시글 캐시 (속도 개선용)
 
@@ -559,7 +559,7 @@ async function openEditModal(postId) {
 }
 
 // ==========================================
-// 이미지 미리보기
+// 이미지 미리보기 (위/아래 버튼으로 순서 변경)
 // ==========================================
 function handleImagePreview(e) {
   const files = Array.from(e.target.files);
@@ -572,26 +572,85 @@ function handleImagePreview(e) {
     return;
   }
 
+  // File 객체 배열로 저장
   uploadedImageFiles = files;
+  updateImagePreview();
+}
 
+// 이미지 미리보기 UI 업데이트
+function updateImagePreview() {
   const imagePreview = document.getElementById('imagePreview');
   imagePreview.innerHTML = '';
 
-  // 각 이미지를 위에서 아래로 미리보기 표시
-  files.forEach((file, index) => {
+  if (!uploadedImageFiles || uploadedImageFiles.length === 0) {
+    return;
+  }
+
+  uploadedImageFiles.forEach((file, index) => {
     const reader = new FileReader();
 
     reader.onload = function(event) {
       const imgDiv = document.createElement('div');
       imgDiv.style.marginTop = '12px';
+      imgDiv.style.padding = '12px';
+      imgDiv.style.border = '2px solid #ddd';
+      imgDiv.style.borderRadius = '8px';
+      imgDiv.style.backgroundColor = '#f9f9f9';
+
       imgDiv.innerHTML = `
-        <img src="${event.target.result}" alt="미리보기 ${index + 1}" style="max-width: 100%; border-radius: 8px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="background: #3b3b3b; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">
+            ${index + 1}
+          </div>
+          <img src="${event.target.result}" alt="미리보기 ${index + 1}" style="max-width: 150px; border-radius: 8px; flex-shrink: 0;">
+          <div style="flex: 1;">
+            <p style="margin: 0; font-size: 14px; color: #666;">${file.name}</p>
+            <p style="margin: 4px 0 0 0; font-size: 12px; color: #999;">${(file.size / 1024).toFixed(1)} KB</p>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <button type="button" onclick="moveImageUp(${index})" ${index === 0 ? 'disabled' : ''}
+              style="padding: 4px 8px; font-size: 12px; background: #3b3b3b; color: white; border: none; border-radius: 4px; cursor: pointer;">
+              ▲
+            </button>
+            <button type="button" onclick="moveImageDown(${index})" ${index === uploadedImageFiles.length - 1 ? 'disabled' : ''}
+              style="padding: 4px 8px; font-size: 12px; background: #3b3b3b; color: white; border: none; border-radius: 4px; cursor: pointer;">
+              ▼
+            </button>
+          </div>
+        </div>
       `;
+
       imagePreview.appendChild(imgDiv);
     };
 
     reader.readAsDataURL(file);
   });
+}
+
+// 이미지 순서 위로 이동
+function moveImageUp(index) {
+  if (index === 0) return;
+
+  const newFiles = Array.from(uploadedImageFiles);
+  const temp = newFiles[index];
+  newFiles[index] = newFiles[index - 1];
+  newFiles[index - 1] = temp;
+  uploadedImageFiles = newFiles;
+
+  updateImagePreview();
+}
+
+// 이미지 순서 아래로 이동
+function moveImageDown(index) {
+  if (index === uploadedImageFiles.length - 1) return;
+
+  const newFiles = Array.from(uploadedImageFiles);
+  const temp = newFiles[index];
+  newFiles[index] = newFiles[index + 1];
+  newFiles[index + 1] = temp;
+  uploadedImageFiles = newFiles;
+
+  updateImagePreview();
 }
 
 // ==========================================
@@ -627,19 +686,41 @@ async function handlePostSubmit() {
     return;
   }
 
+  console.log('=== 게시글 작성 시작 ===');
+  console.log('제목:', title);
+  console.log('내용 길이:', content.length);
+  console.log('썸네일 파일:', uploadedThumbnailFile);
+  console.log('상세 이미지 파일 수:', uploadedImageFiles.length);
+
   try {
     let imageUrls = [];
     let thumbnailUrl = null;
 
     // 썸네일 이미지 업로드
     if (uploadedThumbnailFile) {
-      const thumbnailUrls = await uploadImages([uploadedThumbnailFile]);
-      thumbnailUrl = thumbnailUrls[0];
+      console.log('썸네일 업로드 시작...');
+      try {
+        const thumbnailUrls = await uploadImages([uploadedThumbnailFile]);
+        thumbnailUrl = thumbnailUrls[0];
+        console.log('썸네일 업로드 완료:', thumbnailUrl);
+      } catch (err) {
+        console.error('썸네일 업로드 실패:', err);
+        alert('썸네일 이미지 업로드에 실패했습니다.');
+        return;
+      }
     }
 
     // 상세 이미지 업로드 (여러 개)
     if (uploadedImageFiles && uploadedImageFiles.length > 0) {
-      imageUrls = await uploadImages(uploadedImageFiles);
+      console.log('상세 이미지 업로드 시작...');
+      try {
+        imageUrls = await uploadImages(uploadedImageFiles);
+        console.log('상세 이미지 업로드 완료:', imageUrls);
+      } catch (err) {
+        console.error('상세 이미지 업로드 실패:', err);
+        alert('상세 이미지 업로드에 실패했습니다.');
+        return;
+      }
     }
 
     if (currentEditingPostId) {
@@ -686,7 +767,8 @@ async function handlePostSubmit() {
 
       if (error) {
         console.error('Error updating post:', error);
-        alert('게시글 수정에 실패했습니다.');
+        console.error('Error details:', JSON.stringify(error, null, 2));
+        alert(`게시글 수정에 실패했습니다.\n${error.message || error.hint || '알 수 없는 오류'}`);
         return;
       }
 
@@ -694,23 +776,40 @@ async function handlePostSubmit() {
 
     } else {
       // 새 글 작성
-      const { error } = await supabaseClient
+      const postData = {
+        title,
+        content,
+        thumbnail_url: thumbnailUrl,
+        image_url: imageUrls.length > 0 ? JSON.stringify(imageUrls) : null
+      };
+
+      console.log('DB 저장 시작:', postData);
+
+      const { data, error } = await supabaseClient
         .from('posts')
-        .insert([
-          {
-            title,
-            content,
-            thumbnail_url: thumbnailUrl,
-            image_url: imageUrls.length > 0 ? JSON.stringify(imageUrls) : null
-          }
-        ]);
+        .insert([postData])
+        .select();
 
       if (error) {
-        console.error('Error creating post:', error);
-        alert('게시글 작성에 실패했습니다.');
+        console.error('=== DB 저장 실패 ===');
+        console.error('Error object:', error);
+        console.error('Error code:', error.code);
+        console.error('Error message:', error.message);
+        console.error('Error hint:', error.hint);
+        console.error('Error details:', error.details);
+
+        // 에러 전체 정보 표시
+        let errorMsg = '게시글 작성에 실패했습니다.\n\n';
+        errorMsg += `에러 코드: ${error.code || 'N/A'}\n`;
+        errorMsg += `메시지: ${error.message || 'N/A'}\n`;
+        errorMsg += `힌트: ${error.hint || 'N/A'}\n`;
+        errorMsg += `상세: ${error.details || 'N/A'}`;
+
+        alert(errorMsg);
         return;
       }
 
+      console.log('=== DB 저장 성공 ===', data);
       alert('게시글이 작성되었습니다.');
     }
 
@@ -727,38 +826,78 @@ async function handlePostSubmit() {
 // 이미지 업로드 (여러 개)
 // ==========================================
 async function uploadImages(files) {
-  try {
-    const imageUrls = [];
+  const imageUrls = [];
+  const filesArray = Array.isArray(files) ? files : Array.from(files);
 
-    for (const file of files) {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
-      const filePath = `${fileName}`;
+  console.log('=== 이미지 업로드 시작 ===');
+  console.log('업로드할 파일 수:', filesArray.length);
 
-      const { error } = await supabaseClient.storage
-        .from('post-images')
-        .upload(filePath, file);
+  // 현재 사용자 확인
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  console.log('현재 사용자:', user);
 
-      if (error) {
-        console.error('Error uploading image:', error);
-        throw error;
-      }
+  if (!user) {
+    alert('로그인이 필요합니다.');
+    throw new Error('로그인이 필요합니다.');
+  }
 
-      // 공개 URL 가져오기
-      const { data: urlData } = supabaseClient.storage
-        .from('post-images')
-        .getPublicUrl(filePath);
+  for (let i = 0; i < filesArray.length; i++) {
+    const file = filesArray[i];
 
-      imageUrls.push(urlData.publicUrl);
+    // 파일 유효성 검사
+    if (!file || !file.name) {
+      console.error(`파일 ${i + 1} 유효하지 않음`);
+      throw new Error(`파일 ${i + 1}이 유효하지 않습니다.`);
     }
 
-    return imageUrls;
+    console.log(`\n[${i + 1}/${filesArray.length}] 업로드 시작`);
+    console.log('파일명:', file.name);
+    console.log('파일 크기:', (file.size / 1024).toFixed(2), 'KB');
+    console.log('파일 타입:', file.type);
 
-  } catch (err) {
-    console.error('Error:', err);
-    alert('이미지 업로드에 실패했습니다.');
-    return [];
+    const fileExt = file.name.split('.').pop();
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substring(2, 8);
+    const fileName = `${timestamp}_${random}.${fileExt}`;
+
+    console.log('저장 파일명:', fileName);
+
+    // Storage에 업로드
+    const { data: uploadData, error: uploadError } = await supabaseClient.storage
+      .from('post-images')
+      .upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: false,
+        contentType: file.type
+      });
+
+    if (uploadError) {
+      console.error('=== Storage 업로드 실패 ===');
+      console.error('Error code:', uploadError.statusCode);
+      console.error('Error message:', uploadError.message);
+      console.error('Error details:', uploadError);
+
+      if (uploadError.statusCode === '403' || uploadError.message.includes('403')) {
+        alert('이미지 업로드 권한이 없습니다.\n\nSupabase Storage 정책을 확인해주세요:\n1. Supabase 대시보드 → Storage → post-images\n2. Policies 탭에서 INSERT 정책 확인');
+      }
+
+      throw new Error(`${file.name} 업로드 실패: ${uploadError.message}`);
+    }
+
+    console.log('Storage 업로드 성공:', uploadData);
+
+    // 공개 URL 가져오기
+    const { data: urlData } = supabaseClient.storage
+      .from('post-images')
+      .getPublicUrl(fileName);
+
+    console.log('공개 URL:', urlData.publicUrl);
+    imageUrls.push(urlData.publicUrl);
   }
+
+  console.log('\n=== 모든 이미지 업로드 완료 ===');
+  console.log('업로드된 URL들:', imageUrls);
+  return imageUrls;
 }
 
 // ==========================================

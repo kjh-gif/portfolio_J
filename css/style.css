@@ -377,11 +377,15 @@ footer {
 footer .footer-container {
   max-width: none;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 footer p {
   font-size: 14px;
   opacity: 0.8;
+  margin: 0;
 }
 
 /* ==========================================
