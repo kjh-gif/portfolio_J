@@ -317,7 +317,7 @@ section {
 /* Contact 섹션 */
 .contact-section {
   background-color: var(--color-sub-main-1);
-  padding: var(--spacing-xl) var(--spacing-md);
+  padding: 40px var(--spacing-md);
   max-width: none;
   margin: 0;
 }
