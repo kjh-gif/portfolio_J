@@ -370,7 +370,7 @@ section {
 footer {
   background-color: var(--color-point);
   color: #ffffff;
-  padding: var(--spacing-lg) var(--spacing-md);
+  padding: 32px var(--spacing-md);
   text-align: center;
 }
 
