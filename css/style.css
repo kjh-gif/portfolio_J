@@ -229,7 +229,7 @@ section {
 
 .hero-section .cta-button {
   padding: 14px 36px;
-  background-color: var(--color-point);
+  background-color: #B4AD9C;
   color: #ffffff;
   font-size: 16px;
   font-weight: var(--font-weight-bold);
@@ -238,7 +238,7 @@ section {
 }
 
 .hero-section .cta-button:hover {
-  background-color: #2a2a2a;
+  background-color: #a39988;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
