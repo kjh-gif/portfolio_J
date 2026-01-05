@@ -958,6 +958,16 @@ footer p {
   justify-content: center;
   align-items: center;
   padding: var(--spacing-md);
+  opacity: 0;
+  -webkit-transition: opacity 0.2s ease;
+  -o-transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.modal.show {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .modal-content {
@@ -969,6 +979,18 @@ footer p {
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
+  -webkit-transform: scale(0.95);
+  -ms-transform: scale(0.95);
+  transform: scale(0.95);
+  -webkit-transition: transform 0.2s ease;
+  -o-transition: transform 0.2s ease;
+  transition: transform 0.2s ease;
+}
+
+.modal.show .modal-content {
+  -webkit-transform: scale(1);
+  -ms-transform: scale(1);
+  transform: scale(1);
 }
 
 .modal-content h2 {

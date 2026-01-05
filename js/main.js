@@ -11,11 +11,9 @@ if ('scrollRestoration' in history) {
 let cachedWorkPosts = []; // 로드된 게시글 캐시 (속도 개선용)
 let isUserLoggedIn = false; // 로그인 상태 캐시 (속도 개선용)
 
-// 페이지 로드 시 해시가 있으면 즉시 처리
+// 페이지 로드 시 해시가 있으면 브라우저 자동 스크롤 방지
 if (window.location.hash) {
-  // CSS scroll-behavior 완전 비활성화 (브라우저 자동 스크롤 방지)
-  document.documentElement.style.scrollBehavior = 'auto';
-  // 맨 위로 이동 (브라우저 자동 스크롤 차단)
+  // 브라우저 자동 스크롤 차단
   window.scrollTo(0, 0);
 }
 
@@ -28,17 +26,8 @@ document.addEventListener('DOMContentLoaded', async function() {
   // 게시글 목록 로드
   await loadWorkPosts();
 
-  // 게시글 렌더링 완료 대기 (워크 카드가 화면에 완전히 표시되도록)
-  await new Promise(resolve => {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        setTimeout(resolve, 50);
-      });
-    });
-  });
-
   // URL 해시 처리 (다른 페이지에서 이동 시)
-  // 게시글 완전 렌더링 후 실행하여 정확한 위치 계산
+  // 이미지 로드 완료를 handleUrlHash 내부에서 대기
   await handleUrlHash();
 
   // 부드러운 스크롤 효과 (해시 처리 후 활성화)
@@ -65,20 +54,34 @@ async function handleUrlHash() {
     const targetElement = document.getElementById(targetId);
 
     if (targetElement) {
-      // 레이아웃 계산을 위한 최소 지연
-      await new Promise(resolve => setTimeout(resolve, 10));
+      // 워크 카드 이미지 로드 완료 대기
+      const images = document.querySelectorAll('.work-card img');
+      if (images.length > 0) {
+        await Promise.all(
+          Array.from(images).map(img => {
+            if (img.complete) return Promise.resolve();
+            return new Promise(resolve => {
+              img.onload = resolve;
+              img.onerror = resolve;
+              // 2초 타임아웃
+              setTimeout(resolve, 2000);
+            });
+          })
+        );
+      }
 
-      // 정확한 위치 계산 및 즉시 이동
+      // 정확한 위치 계산
       const headerHeight = 80;
       const targetPosition = targetElement.offsetTop - headerHeight;
 
-      // 즉시 이동 (애니메이션 없이 직접 위치로)
-      window.scrollTo(0, targetPosition);
+      // smooth scroll 활성화
+      document.documentElement.classList.add('smooth-scroll');
 
-      // 이동 완료 후 smooth scroll 활성화
-      setTimeout(() => {
-        document.documentElement.classList.add('smooth-scroll');
-      }, 50);
+      // 부드럽게 스크롤 이동
+      window.scrollTo({
+        top: targetPosition,
+        behavior: 'smooth'
+      });
     }
   } else {
     // 해시가 없으면 바로 smooth scroll 활성화
@@ -282,10 +285,15 @@ async function openDetailModal(postId) {
   const detailContent = document.getElementById('detailContent');
   const detailAdminButtons = document.getElementById('detailAdminButtons');
 
-  // 1. 모달을 즉시 표시 (속도 개선 핵심)
+  // 1. 모달을 즉시 표시 (부드러운 애니메이션)
   detailModal.style.display = 'flex';
 
-  // 2. 로딩 상태 표시
+  // 2. 애니메이션을 위해 show 클래스 추가
+  requestAnimationFrame(() => {
+    detailModal.classList.add('show');
+  });
+
+  // 3. 로딩 상태 표시
   detailTitle.textContent = '로딩 중...';
   detailImages.innerHTML = '';
   detailContent.textContent = '';
@@ -363,9 +371,22 @@ async function openDetailModal(postId) {
 
   } catch (err) {
     console.error('Error:', err);
-    detailModal.style.display = 'none';
+    closeDetailModalWithAnimation();
     alert('오류가 발생했습니다.');
   }
+}
+
+// 모달 닫기 함수 (부드러운 애니메이션)
+function closeDetailModalWithAnimation() {
+  const detailModal = document.getElementById('detailModal');
+
+  // show 클래스 제거로 페이드 아웃
+  detailModal.classList.remove('show');
+
+  // 애니메이션 완료 후 display none
+  setTimeout(() => {
+    detailModal.style.display = 'none';
+  }, 200); // CSS transition과 동일한 시간
 }
 
 // 상세보기 모달 닫기 이벤트 (DOMContentLoaded 후)
@@ -375,21 +396,17 @@ document.addEventListener('DOMContentLoaded', function() {
   const btnCloseDetail = document.getElementById('btnCloseDetail');
 
   if (closeDetailModal) {
-    closeDetailModal.addEventListener('click', function() {
-      detailModal.style.display = 'none';
-    });
+    closeDetailModal.addEventListener('click', closeDetailModalWithAnimation);
   }
 
   if (btnCloseDetail) {
-    btnCloseDetail.addEventListener('click', function() {
-      detailModal.style.display = 'none';
-    });
+    btnCloseDetail.addEventListener('click', closeDetailModalWithAnimation);
   }
 
   // 모달 외부 클릭 시 닫기
   window.addEventListener('click', function(e) {
     if (e.target === detailModal) {
-      detailModal.style.display = 'none';
+      closeDetailModalWithAnimation();
     }
   });
 });
