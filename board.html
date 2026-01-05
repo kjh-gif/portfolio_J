@@ -11,17 +11,11 @@
   <header>
     <div class="header-container">
       <a href="index.html" class="logo">Portfolio</a>
-      <div class="header-right">
-        <nav>
-          <a href="index.html">Home</a>
-          <a href="board.html">Work</a>
-          <a href="index.html#contact">Contact</a>
-        </nav>
-        <div class="admin-controls">
-          <a href="login.html" id="loginLink" class="btn-login-link" style="display:none;">로그인</a>
-          <button id="logoutBtn" class="btn-logout" style="display:none;">로그아웃</button>
-        </div>
-      </div>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="board.html">Work</a>
+        <a href="index.html#contact">Contact</a>
+      </nav>
     </div>
   </header>
 
@@ -29,15 +23,13 @@
   <main class="board-container">
     <section class="board-header">
       <h1>Work</h1>
+      <p class="board-description">대표 UX 웹 프로젝트부터, 서비스 UX와 브랜드 작업까지 단계적으로 구성했습니다.</p>
 
       <!-- 검색 영역 -->
       <div class="search-box">
         <input type="text" id="searchInput" placeholder="제목으로 검색">
         <button id="searchBtn">검색</button>
       </div>
-
-      <!-- 관리자 전용: 글쓰기 버튼 -->
-      <button id="writeBtn" class="btn-write" style="display:none;">글쓰기</button>
     </section>
 
     <!-- 게시글 목록 (카드 형식) -->
@@ -45,40 +37,38 @@
       <!-- 게시글 카드들이 여기에 동적으로 추가됩니다 -->
     </section>
 
-    <!-- 글쓰기/수정 모달 -->
-    <div id="postModal" class="modal" style="display:none;">
+    <!-- 페이지네이션 -->
+    <section class="pagination" id="pagination" style="display:none;">
+      <button id="prevPage" class="pagination-btn">이전</button>
+      <div id="pageNumbers" class="page-numbers"></div>
+      <button id="nextPage" class="pagination-btn">다음</button>
+    </section>
+
+    <!-- 상세보기 모달 -->
+    <div id="detailModal" class="modal" style="display:none;">
       <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2 id="modalTitle">새 글 작성</h2>
+        <span class="close" id="closeDetailModal">&times;</span>
+        <h2 id="detailTitle"></h2>
 
-        <form id="postForm">
-          <div class="form-group">
-            <label for="postTitle">제목</label>
-            <input type="text" id="postTitle" required>
-          </div>
+        <!-- 이미지들 (위에서 아래로) -->
+        <div id="detailImages" style="margin: 20px 0;"></div>
 
-          <div class="form-group">
-            <label for="postContent">내용</label>
-            <textarea id="postContent" rows="10" required></textarea>
-          </div>
+        <!-- 내용 -->
+        <div id="detailContent" style="white-space: pre-wrap; line-height: 1.6;"></div>
 
-          <div class="form-group">
-            <label for="postImage">이미지</label>
-            <input type="file" id="postImage" accept="image/*">
-            <div id="imagePreview"></div>
-          </div>
-
-          <div class="modal-buttons">
-            <button type="submit" class="btn-submit">저장</button>
-            <button type="button" class="btn-cancel">취소</button>
-          </div>
-        </form>
+        <!-- 닫기 버튼 -->
+        <div class="modal-buttons" style="margin-top: 20px;">
+          <button type="button" class="btn-cancel" id="btnCloseDetail">닫기</button>
+        </div>
       </div>
     </div>
   </main>
 
   <!-- 바닥글 -->
   <footer>
+    <div class="footer-container">
+      <p>&copy; 2026 Portfolio. All rights reserved.</p>
+    </div>
   </footer>
 
   <!-- Supabase JavaScript 라이브러리 -->

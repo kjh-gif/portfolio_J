@@ -2,61 +2,360 @@
 // 게시판 페이지 JavaScript
 // ==========================================
 
+// 전역 변수
+let cachedPosts = []; // 로드된 게시글 캐시 (속도 개선용)
+
+// 페이지네이션 변수
+const POSTS_PER_PAGE = 9; // 한 페이지당 게시글 수 (3x3 그리드)
+let currentPage = 1; // 현재 페이지
+let totalPages = 1; // 전체 페이지 수
+let allPosts = []; // 전체 게시글 (필터링 전)
+
 document.addEventListener('DOMContentLoaded', async function() {
 
-  // 로그인 상태 확인
-  const isLoggedIn = await checkAuth();
-  const user = await getCurrentUser();
-
   // UI 요소
-  const loginLink = document.getElementById('loginLink');
-  const logoutBtn = document.getElementById('logoutBtn');
-  const writeBtn = document.getElementById('writeBtn');
+  const searchBtn = document.getElementById('searchBtn');
+  const searchInput = document.getElementById('searchInput');
 
-  // 관리자 로그인 상태에 따른 UI 표시
-  if (isLoggedIn && user) {
-    // 로그인 상태
-    if (loginLink) loginLink.style.display = 'none';
-    if (logoutBtn) logoutBtn.style.display = 'block';
+  // 게시글 목록 로드
+  await loadPosts();
 
-    // 글쓰기 버튼 표시 (관리자만)
-    if (writeBtn) {
-      writeBtn.style.display = 'block';
-    }
-  } else {
-    // 비로그인 상태
-    if (loginLink) loginLink.style.display = 'block';
-    if (logoutBtn) logoutBtn.style.display = 'none';
-    if (writeBtn) {
-      writeBtn.style.display = 'none';
-    }
+  // 검색 버튼 클릭
+  if (searchBtn) {
+    searchBtn.addEventListener('click', async function() {
+      const keyword = searchInput.value.trim();
+      currentPage = 1; // 검색 시 첫 페이지로 이동
+      await loadPosts(keyword);
+    });
   }
 
-  // 로그아웃 버튼 이벤트
-  logoutBtn.addEventListener('click', async function() {
-    try {
-      const { error } = await supabaseClient.auth.signOut();
-
-      if (error) {
-        console.error('Logout error:', error);
-        alert('로그아웃에 실패했습니다.');
-        return;
+  // 검색 입력 엔터키
+  if (searchInput) {
+    searchInput.addEventListener('keypress', async function(e) {
+      if (e.key === 'Enter') {
+        const keyword = searchInput.value.trim();
+        currentPage = 1; // 검색 시 첫 페이지로 이동
+        await loadPosts(keyword);
       }
+    });
+  }
 
-      // 로그아웃 성공 - 메인 페이지로 이동
-      alert('로그아웃되었습니다.');
-      window.location.href = 'index.html';
+  // 페이지네이션 버튼 이벤트
+  const prevPage = document.getElementById('prevPage');
+  const nextPage = document.getElementById('nextPage');
 
-    } catch (err) {
-      console.error('Error:', err);
-      alert('오류가 발생했습니다.');
+  if (prevPage) {
+    prevPage.addEventListener('click', function() {
+      if (currentPage > 1) {
+        currentPage--;
+        displayCurrentPage();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+  }
+
+  if (nextPage) {
+    nextPage.addEventListener('click', function() {
+      if (currentPage < totalPages) {
+        currentPage++;
+        displayCurrentPage();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+  }
+
+  // 상세보기 모달 닫기
+  const detailModal = document.getElementById('detailModal');
+  const closeDetailModal = document.getElementById('closeDetailModal');
+  const btnCloseDetail = document.getElementById('btnCloseDetail');
+
+  if (closeDetailModal) {
+    closeDetailModal.addEventListener('click', function() {
+      detailModal.style.display = 'none';
+    });
+  }
+
+  if (btnCloseDetail) {
+    btnCloseDetail.addEventListener('click', function() {
+      detailModal.style.display = 'none';
+    });
+  }
+
+  // 상세보기 모달 외부 클릭 시 닫기
+  window.addEventListener('click', function(e) {
+    if (e.target === detailModal) {
+      detailModal.style.display = 'none';
     }
   });
 
-  // TODO: 게시판 기능 구현 예정
-  // - 게시글 목록 조회
-  // - 게시글 작성
-  // - 게시글 수정/삭제
-  // - 검색 기능
+  // URL 해시가 있으면 해당 게시글 상세보기 열기
+  const hash = window.location.hash;
+  if (hash && hash.startsWith('#post-')) {
+    const postId = hash.replace('#post-', '');
+    if (postId) {
+      // 페이지 로드 후 약간의 딜레이를 두고 모달 열기
+      setTimeout(async () => {
+        await openDetailModal(postId);
+      }, 500);
+    }
+  }
 
 });
+
+// ==========================================
+// 게시글 목록 조회
+// ==========================================
+async function loadPosts(keyword = '') {
+  try {
+    let query = supabaseClient
+      .from('posts')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    // 검색어가 있으면 제목으로 필터링
+    if (keyword) {
+      query = query.ilike('title', `%${keyword}%`);
+    }
+
+    const { data: posts, error } = await query;
+
+    if (error) {
+      console.error('Error loading posts:', error);
+      alert('게시글을 불러오는데 실패했습니다.');
+      return;
+    }
+
+    // 전체 게시글 저장
+    allPosts = posts;
+    cachedPosts = posts; // 캐시에도 저장 (속도 개선)
+
+    // 전체 페이지 수 계산
+    totalPages = Math.ceil(posts.length / POSTS_PER_PAGE);
+
+    // 현재 페이지가 전체 페이지 수를 초과하면 마지막 페이지로 이동
+    if (currentPage > totalPages && totalPages > 0) {
+      currentPage = totalPages;
+    }
+
+    // 현재 페이지 게시글 표시
+    displayCurrentPage();
+
+  } catch (err) {
+    console.error('Error:', err);
+    alert('오류가 발생했습니다.');
+  }
+}
+
+// ==========================================
+// 현재 페이지 게시글 표시
+// ==========================================
+function displayCurrentPage() {
+  // 현재 페이지에 해당하는 게시글만 추출
+  const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
+  const endIndex = startIndex + POSTS_PER_PAGE;
+  const postsToDisplay = allPosts.slice(startIndex, endIndex);
+
+  displayPosts(postsToDisplay);
+  updatePagination();
+}
+
+// ==========================================
+// 게시글 화면에 표시
+// ==========================================
+function displayPosts(posts) {
+  const postGrid = document.getElementById('postGrid');
+
+  if (!posts || posts.length === 0) {
+    postGrid.innerHTML = '<p style="text-align: center; padding: 40px; color: #666;">게시글이 없습니다.</p>';
+    return;
+  }
+
+  postGrid.innerHTML = posts.map(post => {
+    // 썸네일 또는 첫 번째 이미지 사용
+    let thumbnailUrl = post.thumbnail_url;
+
+    // 썸네일이 없으면 첫 번째 상세 이미지 사용
+    if (!thumbnailUrl && post.image_url) {
+      let imageUrls = [];
+      if (typeof post.image_url === 'string') {
+        try {
+          imageUrls = JSON.parse(post.image_url);
+        } catch {
+          imageUrls = [post.image_url];
+        }
+      } else if (Array.isArray(post.image_url)) {
+        imageUrls = post.image_url;
+      }
+      thumbnailUrl = imageUrls.length > 0 ? imageUrls[0] : null;
+    }
+
+    // 내용 미리보기 (30자로 제한)
+    const contentPreview = post.content.length > 30
+      ? post.content.substring(0, 30) + '...'
+      : post.content;
+
+    return `
+      <div class="post-card" data-id="${post.id}">
+        ${thumbnailUrl ? `<img src="${thumbnailUrl}" alt="${escapeHtml(post.title)}">` : ''}
+        <div class="post-card-content">
+          <h3>${escapeHtml(post.title)}</h3>
+          <p>${escapeHtml(contentPreview)}</p>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // 카드 클릭 이벤트 (상세보기/수정)
+  const postCards = document.querySelectorAll('.post-card');
+  postCards.forEach(card => {
+    card.addEventListener('click', async function() {
+      const postId = this.getAttribute('data-id');
+      await handlePostCardClick(postId);
+    });
+  });
+}
+
+// ==========================================
+// 게시글 카드 클릭 처리 (상세보기만)
+// ==========================================
+async function handlePostCardClick(postId) {
+  await openDetailModal(postId);
+}
+
+// ==========================================
+// HTML 이스케이프 (XSS 방지)
+// ==========================================
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// ==========================================
+// 상세보기 모달 열기
+// ==========================================
+async function openDetailModal(postId) {
+  const detailModal = document.getElementById('detailModal');
+  const detailTitle = document.getElementById('detailTitle');
+  const detailImages = document.getElementById('detailImages');
+  const detailContent = document.getElementById('detailContent');
+
+  // 1. 모달을 즉시 표시 (속도 개선 핵심)
+  detailModal.style.display = 'flex';
+
+  // 2. 로딩 상태 표시
+  detailTitle.textContent = '로딩 중...';
+  detailImages.innerHTML = '';
+  detailContent.textContent = '';
+
+  try {
+    // 3. 캐시에서 먼저 찾기
+    let post = cachedPosts.find(p => p.id === postId);
+
+    // 캐시에 없으면 DB에서 가져오기
+    if (!post) {
+      const { data, error } = await supabaseClient
+        .from('posts')
+        .select('*')
+        .eq('id', postId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching post:', error);
+        detailModal.style.display = 'none';
+        alert('게시글을 불러오는데 실패했습니다.');
+        return;
+      }
+
+      post = data;
+    }
+
+    // 4. 데이터로 내용 채우기
+    detailTitle.textContent = post.title;
+
+    // 이미지들 표시 (위에서 아래로)
+    if (post.image_url) {
+      let imageUrls = [];
+      if (typeof post.image_url === 'string') {
+        try {
+          imageUrls = JSON.parse(post.image_url);
+        } catch {
+          imageUrls = [post.image_url];
+        }
+      } else if (Array.isArray(post.image_url)) {
+        imageUrls = post.image_url;
+      }
+
+      imageUrls.forEach(url => {
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = post.title;
+        img.style.width = '100%';
+        img.style.marginBottom = '8px';
+        img.style.borderRadius = '8px';
+        detailImages.appendChild(img);
+      });
+    }
+
+    // 내용 표시
+    detailContent.textContent = post.content;
+
+  } catch (err) {
+    console.error('Error:', err);
+    detailModal.style.display = 'none';
+    alert('오류가 발생했습니다.');
+  }
+}
+
+// ==========================================
+// 페이지네이션 UI 업데이트
+// ==========================================
+function updatePagination() {
+  const pagination = document.getElementById('pagination');
+  const prevPage = document.getElementById('prevPage');
+  const nextPage = document.getElementById('nextPage');
+  const pageNumbers = document.getElementById('pageNumbers');
+
+  // 게시글이 없거나 한 페이지만 있으면 페이지네이션 숨김
+  if (totalPages <= 1) {
+    pagination.style.display = 'none';
+    return;
+  }
+
+  pagination.style.display = 'flex';
+
+  // 이전 버튼 활성화/비활성화
+  prevPage.disabled = currentPage === 1;
+
+  // 다음 버튼 활성화/비활성화
+  nextPage.disabled = currentPage === totalPages;
+
+  // 페이지 번호 생성 (최대 5개씩 표시)
+  pageNumbers.innerHTML = '';
+
+  let startPage = Math.max(1, currentPage - 2);
+  let endPage = Math.min(totalPages, startPage + 4);
+
+  // 끝 페이지가 5개 미만이면 시작 페이지 조정
+  if (endPage - startPage < 4) {
+    startPage = Math.max(1, endPage - 4);
+  }
+
+  for (let i = startPage; i <= endPage; i++) {
+    const pageBtn = document.createElement('button');
+    pageBtn.className = 'page-number';
+    pageBtn.textContent = i;
+
+    if (i === currentPage) {
+      pageBtn.classList.add('active');
+    }
+
+    pageBtn.addEventListener('click', function() {
+      currentPage = i;
+      displayCurrentPage();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    pageNumbers.appendChild(pageBtn);
+  }
+}

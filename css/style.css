@@ -184,6 +184,9 @@ section {
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 0;
+  max-width: none;
+  margin: 0;
 }
 
 .hero-section::before {
@@ -209,7 +212,7 @@ section {
 }
 
 .hero-section h1 {
-  font-size: 56px;
+  font-size: 52px;
   font-weight: var(--font-weight-bold);
   color: var(--color-point);
   margin-bottom: var(--spacing-md);
@@ -217,17 +220,17 @@ section {
 }
 
 .hero-section p {
-  font-size: 24px;
+  font-size: 20px;
   color: var(--color-text);
   margin-bottom: var(--spacing-lg);
   line-height: 1.6;
 }
 
 .hero-section .cta-button {
-  padding: 16px 40px;
+  padding: 14px 36px;
   background-color: var(--color-point);
   color: #ffffff;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: var(--font-weight-bold);
   border-radius: 8px;
   transition: all 0.3s ease;
@@ -245,7 +248,7 @@ section {
 }
 
 .work-section h2 {
-  font-size: 48px;
+  font-size: 44px;
   font-weight: var(--font-weight-bold);
   color: var(--color-point);
   margin-bottom: var(--spacing-lg);
@@ -253,8 +256,8 @@ section {
 
 .work-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: var(--spacing-md);
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
   margin-top: var(--spacing-lg);
 }
 
@@ -264,6 +267,11 @@ section {
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .work-card:hover {
@@ -273,43 +281,71 @@ section {
 
 .work-card img {
   width: 100%;
-  height: 250px;
+  height: 70%;
   object-fit: cover;
+  flex-shrink: 0;
 }
 
 .work-card-content {
-  padding: var(--spacing-md);
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .work-card h3 {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: var(--font-weight-bold);
   color: var(--color-point);
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .work-card p {
   font-size: 16px;
   color: var(--color-text-light);
-  line-height: 1.6;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* Contact 섹션 */
 .contact-section {
   background-color: var(--color-sub-main-1);
+  padding: var(--spacing-xl) var(--spacing-md);
+  max-width: none;
+  margin: 0;
 }
 
 .contact-section h2 {
-  font-size: 48px;
+  font-size: 44px;
   font-weight: var(--font-weight-bold);
   color: var(--color-point);
   margin-bottom: var(--spacing-lg);
+  max-width: var(--max-width);
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .contact-content {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
+  max-width: var(--max-width);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.contact-description {
+  font-size: 16px;
+  color: var(--color-text-light);
+  line-height: 1.6;
+  margin-bottom: var(--spacing-xs);
 }
 
 .contact-info {
@@ -339,8 +375,8 @@ footer {
 }
 
 footer .footer-container {
-  max-width: var(--max-width);
-  margin: 0 auto;
+  max-width: none;
+  margin: 0;
 }
 
 footer p {
@@ -365,16 +401,16 @@ footer p {
   }
 
   .hero-section h1 {
-    font-size: 48px;
+    font-size: 44px;
   }
 
   .hero-section p {
-    font-size: 20px;
+    font-size: 18px;
   }
 
   .work-section h2,
   .contact-section h2 {
-    font-size: 40px;
+    font-size: 36px;
   }
 }
 
@@ -414,19 +450,24 @@ footer p {
   }
 
   .hero-section h1 {
-    font-size: 36px;
+    font-size: 32px;
   }
 
   .hero-section p {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .work-section h2,
   .contact-section h2 {
-    font-size: 32px;
+    font-size: 28px;
   }
 
-  .work-grid {
+  .contact-description {
+    font-size: 14px;
+  }
+
+  .work-grid,
+  .post-grid {
     grid-template-columns: 1fr;
   }
 
@@ -613,6 +654,7 @@ footer p {
 .board-container {
   min-height: calc(100vh - var(--header-height));
   padding-top: var(--spacing-lg);
+  padding-bottom: 100px;
 }
 
 .board-header {
@@ -628,6 +670,24 @@ footer p {
   font-size: 48px;
   font-weight: var(--font-weight-bold);
   color: var(--color-point);
+  margin-bottom: 28px;
+}
+
+.board-description {
+  font-size: 16px;
+  font-weight: var(--font-weight-normal);
+  color: var(--color-text-light);
+  line-height: 1.6;
+  margin-bottom: var(--spacing-lg);
+}
+
+/* 검색 영역 및 Write 링크 (Admin 전용) */
+.search-row {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
 }
 
 /* 검색 박스 */
@@ -635,6 +695,24 @@ footer p {
   display: flex;
   gap: var(--spacing-sm);
   max-width: 500px;
+  width: 500px;
+  margin-bottom: var(--spacing-md);
+}
+
+.write-link {
+  font-size: 14px;
+  font-weight: var(--font-weight-normal);
+  color: var(--color-sub-point);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  padding: 8px 16px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.write-link:hover {
+  color: var(--color-point);
+  background-color: var(--color-sub-main-2);
 }
 
 .search-box input {
@@ -669,9 +747,10 @@ footer p {
   max-width: var(--max-width);
   margin: 0 auto;
   padding: 0 var(--spacing-md);
+  padding-top: var(--spacing-md);
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: var(--spacing-md);
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
 }
 
 .post-card {
@@ -680,6 +759,11 @@ footer p {
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .post-card:hover {
@@ -689,25 +773,33 @@ footer p {
 
 .post-card img {
   width: 100%;
-  height: 220px;
+  height: 70%;
   object-fit: cover;
+  flex-shrink: 0;
 }
 
 .post-card-content {
-  padding: var(--spacing-md);
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .post-card h3 {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: var(--font-weight-bold);
   color: var(--color-point);
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .post-card p {
   font-size: 16px;
   color: var(--color-text-light);
-  line-height: 1.6;
+  line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -733,7 +825,7 @@ footer p {
   background-color: #ffffff;
   border-radius: 16px;
   padding: var(--spacing-xl);
-  max-width: 700px;
+  max-width: 1200px;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
@@ -781,10 +873,93 @@ footer p {
   margin-top: var(--spacing-sm);
 }
 
+/* 페이지네이션 */
+.pagination {
+  max-width: var(--max-width);
+  margin: var(--spacing-xl) auto 0;
+  padding: 0 var(--spacing-md);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.pagination-btn {
+  padding: 10px 20px;
+  background-color: var(--color-point);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: var(--font-weight-bold);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background-color: #2a2a2a;
+}
+
+.pagination-btn:disabled {
+  background-color: var(--color-sub-point);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.page-numbers {
+  display: flex;
+  gap: 8px;
+}
+
+.page-number {
+  padding: 10px 16px;
+  background-color: #ffffff;
+  color: var(--color-text);
+  font-size: 16px;
+  font-weight: var(--font-weight-bold);
+  border: 2px solid var(--color-sub-point);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.page-number:hover {
+  border-color: var(--color-point);
+  background-color: var(--color-sub-main-2);
+}
+
+.page-number.active {
+  background-color: var(--color-point);
+  color: #ffffff;
+  border-color: var(--color-point);
+}
+
 /* 반응형 - 게시판 */
 @media (max-width: 768px) {
   .board-header h1 {
     font-size: 32px;
+    margin-bottom: 20px;
+  }
+
+  .search-box {
+    max-width: 100%;
+  }
+
+  .search-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+
+  .write-link {
+    font-size: 13px;
+    padding: 6px 12px;
+    align-self: flex-end;
+  }
+
+  .board-description {
+    font-size: 14px;
+    margin-bottom: var(--spacing-md);
   }
 
   .post-grid {
@@ -797,5 +972,20 @@ footer p {
 
   .modal-content {
     padding: var(--spacing-lg);
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .pagination-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+
+  .page-number {
+    padding: 8px 12px;
+    font-size: 14px;
   }
 }

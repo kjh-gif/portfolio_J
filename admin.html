@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio | Admin</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- 헤더 영역 -->
+  <header>
+    <div class="header-container">
+      <a href="index.html" class="logo">Portfolio</a>
+      <div class="header-right">
+        <nav>
+          <a href="index.html">Home</a>
+          <a href="board.html">Work</a>
+          <a href="admin.html">Admin</a>
+        </nav>
+        <div class="admin-controls">
+          <button id="logoutBtn" class="btn-logout">로그아웃</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 메인 컨텐츠 -->
+  <main class="board-container">
+    <section class="board-header">
+      <h1>Work Admin</h1>
+      <p class="board-description">프로젝트 관리 페이지입니다.</p>
+
+      <!-- 검색 영역 및 Write 링크 -->
+      <div class="search-row">
+        <div class="search-box">
+          <input type="text" id="searchInput" placeholder="제목으로 검색">
+          <button id="searchBtn">검색</button>
+        </div>
+        <!-- 관리자 전용: Write 링크 -->
+        <a href="#" id="writeBtn" class="write-link">Write</a>
+      </div>
+    </section>
+
+    <!-- 게시글 목록 (카드 형식) -->
+    <section class="post-grid" id="postGrid">
+      <!-- 게시글 카드들이 여기에 동적으로 추가됩니다 -->
+    </section>
+
+    <!-- 페이지네이션 -->
+    <section class="pagination" id="pagination" style="display:none;">
+      <button id="prevPage" class="pagination-btn">이전</button>
+      <div id="pageNumbers" class="page-numbers"></div>
+      <button id="nextPage" class="pagination-btn">다음</button>
+    </section>
+
+    <!-- 글쓰기/수정 모달 -->
+    <div id="postModal" class="modal" style="display:none;">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 id="modalTitle">새 글 작성</h2>
+
+        <form id="postForm">
+          <div class="form-group">
+            <label for="postTitle">제목</label>
+            <input type="text" id="postTitle" required>
+          </div>
+
+          <div class="form-group">
+            <label for="postContent">내용</label>
+            <textarea id="postContent" rows="10" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="thumbnailImage">썸네일 이미지 (목록에 표시)</label>
+            <input type="file" id="thumbnailImage" accept="image/*">
+            <div id="thumbnailPreview"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="postImage">상세 이미지 (최대 3개)</label>
+            <input type="file" id="postImage" accept="image/*" multiple>
+            <div id="imagePreview"></div>
+          </div>
+
+          <div class="modal-buttons">
+            <button type="submit" class="btn-submit">저장</button>
+            <button type="button" class="btn-cancel">취소</button>
+            <button type="button" id="btnDelete" class="btn-delete" style="display:none;">삭제</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 상세보기 모달 -->
+    <div id="detailModal" class="modal" style="display:none;">
+      <div class="modal-content">
+        <span class="close" id="closeDetailModal">&times;</span>
+        <h2 id="detailTitle"></h2>
+
+        <!-- 이미지들 (위에서 아래로) -->
+        <div id="detailImages" style="margin: 20px 0;"></div>
+
+        <!-- 내용 -->
+        <div id="detailContent" style="white-space: pre-wrap; line-height: 1.6;"></div>
+
+        <!-- 관리자 전용 버튼 -->
+        <div id="detailAdminButtons" class="modal-buttons" style="margin-top: 30px;">
+          <button type="button" id="btnEditFromDetail" class="btn-submit">수정</button>
+          <button type="button" id="btnDeleteFromDetail" class="btn-delete">삭제</button>
+        </div>
+
+        <!-- 닫기 버튼 -->
+        <div class="modal-buttons" style="margin-top: 20px;">
+          <button type="button" class="btn-cancel" id="btnCloseDetail">닫기</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 바닥글 -->
+  <footer>
+    <div class="footer-container">
+      <p>&copy; 2026 Portfolio. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Supabase JavaScript 라이브러리 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- 설정 파일 및 Supabase 클라이언트 -->
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+
+  <!-- 관리자 페이지 스크립트 -->
+  <script src="js/admin.js"></script>
+</body>
+</html>

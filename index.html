@@ -32,47 +32,22 @@
     <section id="home" class="hero-section">
       <div class="hero-content">
         <h1>UI/UX Designer<br>Portfolio</h1>
-        <p>사용자 경험을 중심으로 설계하는<br>웹 디자이너입니다.</p>
-        <a href="#work" class="cta-button">작업물 보기</a>
+        <p>사용자 흐름과 정보 구조를 설계하는<br>UI/UX 기반 웹디자이너입니다.</p>
+        <a href="#work" class="cta-button">대표 UX 프로젝트 보기</a>
       </div>
     </section>
 
     <!-- Work 섹션 -->
     <section id="work" class="work-section">
       <h2>Work</h2>
-      <p>다양한 프로젝트를 통해 사용자 중심의 디자인을 구현합니다.</p>
+      <p>대표 UX 웹 프로젝트부터 서비스 UX, 브랜드 작업까지 단계적으로 구성했습니다.</p>
 
-      <div class="work-grid">
-        <!-- 샘플 작업물 카드 1 -->
-        <div class="work-card">
-          <img src="img/work-sample-1.jpg" alt="프로젝트 1" onerror="this.style.backgroundColor='#DCD3CD'; this.style.height='250px';">
-          <div class="work-card-content">
-            <h3>프로젝트 제목 1</h3>
-            <p>프로젝트에 대한 간단한 설명이 들어갑니다. UX 목표와 주요 기능을 소개합니다.</p>
-          </div>
-        </div>
-
-        <!-- 샘플 작업물 카드 2 -->
-        <div class="work-card">
-          <img src="img/work-sample-2.jpg" alt="프로젝트 2" onerror="this.style.backgroundColor='#DCD3CD'; this.style.height='250px';">
-          <div class="work-card-content">
-            <h3>프로젝트 제목 2</h3>
-            <p>프로젝트에 대한 간단한 설명이 들어갑니다. UX 목표와 주요 기능을 소개합니다.</p>
-          </div>
-        </div>
-
-        <!-- 샘플 작업물 카드 3 -->
-        <div class="work-card">
-          <img src="img/work-sample-3.jpg" alt="프로젝트 3" onerror="this.style.backgroundColor='#DCD3CD'; this.style.height='250px';">
-          <div class="work-card-content">
-            <h3>프로젝트 제목 3</h3>
-            <p>프로젝트에 대한 간단한 설명이 들어갑니다. UX 목표와 주요 기능을 소개합니다.</p>
-          </div>
-        </div>
+      <div class="work-grid" id="workGrid">
+        <!-- 게시글 카드들이 여기에 동적으로 추가됩니다 -->
       </div>
 
       <div style="text-align: center; margin-top: 48px;">
-        <a href="board.html" class="cta-button">더 많은 작업물 보기</a>
+        <a href="board.html" class="cta-button">전체 프로젝트 보기 →</a>
       </div>
     </section>
 
@@ -84,17 +59,43 @@
           프로젝트 문의 및 협업 제안을 환영합니다.<br>
           아래 이메일로 연락 주세요.
         </p>
+        <p class="contact-description">실무 협업 및 포트폴리오 관련 문의를 환영합니다.</p>
         <p class="contact-info">
-          Email: <a href="mailto:your.email@example.com">your.email@example.com</a>
+          Email: <a href="mailto:poohdd@naver.com">poohdd@naver.com</a>
         </p>
       </div>
     </section>
+
+    <!-- 상세보기 모달 -->
+    <div id="detailModal" class="modal" style="display:none;">
+      <div class="modal-content">
+        <span class="close" id="closeDetailModal">&times;</span>
+        <h2 id="detailTitle"></h2>
+
+        <!-- 이미지들 (위에서 아래로) -->
+        <div id="detailImages" style="margin: 20px 0;"></div>
+
+        <!-- 내용 -->
+        <div id="detailContent" style="white-space: pre-wrap; line-height: 1.6;"></div>
+
+        <!-- 관리자 전용 버튼 -->
+        <div id="detailAdminButtons" class="modal-buttons" style="display:none; margin-top: 30px;">
+          <button type="button" id="btnEditFromDetail" class="btn-submit">수정</button>
+          <button type="button" id="btnDeleteFromDetail" class="btn-delete">삭제</button>
+        </div>
+
+        <!-- 닫기 버튼 -->
+        <div class="modal-buttons" style="margin-top: 20px;">
+          <button type="button" class="btn-cancel" id="btnCloseDetail">닫기</button>
+        </div>
+      </div>
+    </div>
   </main>
 
   <!-- 바닥글 영역 -->
   <footer>
     <div class="footer-container">
-      <p>&copy; 2024 Portfolio. All rights reserved.</p>
+      <p>&copy; 2026 Portfolio. All rights reserved.</p>
     </div>
   </footer>
 
