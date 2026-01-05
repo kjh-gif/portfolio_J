@@ -122,7 +122,7 @@ header .header-container nav {
 header .logo {
   font-size: 24px;
   font-weight: var(--font-weight-bold);
-  color: var(--color-point);
+  color: #A6A196;
 }
 
 /* 네비게이션 */
