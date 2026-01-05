@@ -248,7 +248,7 @@ section {
 }
 
 .work-section h2 {
-  font-size: 48px;
+  font-size: 32px;
   font-weight: var(--font-weight-bold);
   color: var(--color-point);
   margin-bottom: var(--spacing-lg);
@@ -317,13 +317,13 @@ section {
 /* Contact 섹션 */
 .contact-section {
   background-color: var(--color-sub-main-1);
-  padding: 40px var(--spacing-md);
+  padding: 27px var(--spacing-md);
   max-width: none;
   margin: 0;
 }
 
 .contact-section h2 {
-  font-size: 48px;
+  font-size: 32px;
   font-weight: var(--font-weight-bold);
   color: var(--color-point);
   margin-bottom: var(--spacing-lg);
@@ -418,7 +418,7 @@ footer p {
 
   .work-section h2,
   .contact-section h2 {
-    font-size: 48px;
+    font-size: 32px;
   }
 }
 
@@ -467,7 +467,7 @@ footer p {
 
   .work-section h2,
   .contact-section h2 {
-    font-size: 40px;
+    font-size: 27px;
   }
 
   .contact-description {
