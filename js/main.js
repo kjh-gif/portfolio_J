@@ -24,7 +24,37 @@ document.addEventListener('DOMContentLoaded', async function() {
   // 작업물 카드 클릭 이벤트
   initWorkCards();
 
+  // URL 해시 처리 (다른 페이지에서 이동 시)
+  handleUrlHash();
+
 });
+
+// ==========================================
+// URL 해시 처리 (페이지 로드 시)
+// ==========================================
+function handleUrlHash() {
+  // URL에 해시가 있는지 확인
+  const hash = window.location.hash;
+
+  if (hash) {
+    // 해시에서 # 제거
+    const targetId = hash.substring(1);
+    const targetElement = document.getElementById(targetId);
+
+    if (targetElement) {
+      // 페이지 로드 직후 스크롤이 제대로 작동하도록 약간 지연
+      setTimeout(() => {
+        const headerHeight = 80; // 헤더 높이
+        const targetPosition = targetElement.offsetTop - headerHeight;
+
+        window.scrollTo({
+          top: targetPosition,
+          behavior: 'smooth'
+        });
+      }, 100);
+    }
+  }
+}
 
 // ==========================================
 // 부드러운 스크롤 효과
