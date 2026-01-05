@@ -275,7 +275,6 @@ section {
   cursor: pointer;
   width: 100%;
   height: auto;
-  aspect-ratio: 1 / 1;
   display: flex;
   flex-direction: column;
 }
@@ -287,7 +286,7 @@ section {
 
 .work-card img {
   width: 100%;
-  height: 60%;
+  height: auto;
   object-fit: cover;
   flex-shrink: 0;
 }
@@ -497,17 +496,6 @@ footer p {
   .work-grid,
   .post-grid {
     grid-template-columns: 1fr;
-  }
-
-  .work-card,
-  .post-card {
-    aspect-ratio: auto;
-  }
-
-  .work-card img,
-  .post-card img {
-    height: auto;
-    max-height: 300px;
   }
 
   section {
@@ -800,7 +788,6 @@ footer p {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   width: 100%;
   height: auto;
-  aspect-ratio: 1 / 1;
   display: flex;
   flex-direction: column;
 }
@@ -812,7 +799,7 @@ footer p {
 
 .post-card img {
   width: 100%;
-  height: 60%;
+  height: auto;
   object-fit: cover;
   flex-shrink: 0;
 }
