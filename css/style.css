@@ -303,7 +303,7 @@ section {
 .work-card h3 {
   font-size: 18px;
   font-weight: var(--font-weight-bold);
-  color: #463C29;
+  color: #564825;
   margin-bottom: 4px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -828,7 +828,7 @@ footer p {
 .post-card h3 {
   font-size: 18px;
   font-weight: var(--font-weight-bold);
-  color: #463C29;
+  color: #564825;
   margin-bottom: 4px;
   overflow: hidden;
   text-overflow: ellipsis;
