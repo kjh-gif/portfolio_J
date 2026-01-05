@@ -317,13 +317,9 @@ section {
 /* Contact 섹션 */
 .contact-section {
   background-color: var(--color-sub-main-1);
-  padding: 40px var(--spacing-md);
+  padding: var(--spacing-xl) var(--spacing-md);
   max-width: none;
   margin: 0;
-  min-height: 200px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 
 .contact-section h2 {
@@ -424,11 +420,6 @@ footer p {
   .contact-section h2 {
     font-size: 36px;
   }
-
-  .contact-section {
-    padding: 30px var(--spacing-md);
-    min-height: 190px;
-  }
 }
 
 /* 모바일 */
@@ -481,11 +472,6 @@ footer p {
 
   .contact-description {
     font-size: 16px;
-  }
-
-  .contact-section {
-    padding: 24px var(--spacing-md);
-    min-height: 175px;
   }
 
   .work-grid,
