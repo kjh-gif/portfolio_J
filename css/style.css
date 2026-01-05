@@ -255,6 +255,7 @@ section {
 }
 
 .work-section > p {
+  font-size: 18px;
   color: #605D5D;
 }
 
@@ -346,15 +347,15 @@ section {
 }
 
 .contact-description {
-  font-size: 20px;
+  font-size: 18px;
   color: #605D5D;
   line-height: 1.6;
   margin-bottom: 21px;
 }
 
 .contact-info {
-  font-size: 20px;
-  color: var(--color-text);
+  font-size: 18px;
+  color: #605D5D;
   line-height: 1.8;
 }
 
