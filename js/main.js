@@ -11,14 +11,12 @@ if ('scrollRestoration' in history) {
 let cachedWorkPosts = []; // 로드된 게시글 캐시 (속도 개선용)
 let isUserLoggedIn = false; // 로그인 상태 캐시 (속도 개선용)
 
-// 페이지 로드 시 해시가 있으면 스크롤을 즉시 맨 위로 고정
+// 페이지 로드 시 해시가 있으면 즉시 처리
 if (window.location.hash) {
   // CSS scroll-behavior 완전 비활성화 (브라우저 자동 스크롤 방지)
   document.documentElement.style.scrollBehavior = 'auto';
+  // 맨 위로 이동 (브라우저 자동 스크롤 차단)
   window.scrollTo(0, 0);
-
-  // 부드러운 전환을 위해 페이지를 투명하게 시작
-  document.body.style.opacity = '0';
 }
 
 // DOM이 로드된 후 실행
@@ -58,27 +56,20 @@ async function handleUrlHash() {
     const targetElement = document.getElementById(targetId);
 
     if (targetElement) {
-      // 약간의 지연으로 레이아웃 안정화 대기
-      await new Promise(resolve => setTimeout(resolve, 50));
+      // 레이아웃 계산을 위한 최소 지연
+      await new Promise(resolve => setTimeout(resolve, 10));
 
       // 정확한 위치 계산 및 즉시 이동
-      const headerHeight = 80; // 헤더 높이
+      const headerHeight = 80;
       const targetPosition = targetElement.offsetTop - headerHeight;
 
-      window.scrollTo({
-        top: targetPosition,
-        behavior: 'auto' // 즉시 이동 (끊김 없음)
-      });
+      // 즉시 이동 (애니메이션 없이 직접 위치로)
+      window.scrollTo(0, targetPosition);
 
-      // 위치 이동 후 페이드 인 효과로 부드럽게 표시
-      requestAnimationFrame(() => {
-        document.body.style.opacity = '1';
-      });
-
-      // 해시 네비게이션 완료 후 smooth scroll 활성화
+      // 이동 완료 후 smooth scroll 활성화
       setTimeout(() => {
         document.documentElement.classList.add('smooth-scroll');
-      }, 100);
+      }, 50);
     }
   } else {
     // 해시가 없으면 바로 smooth scroll 활성화
