@@ -55,8 +55,13 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  /* scroll-behavior는 JavaScript로 제어 (해시 네비게이션 충돌 방지) */
   font-size: var(--font-size-base);
+}
+
+/* 같은 페이지 내 네비게이션에만 smooth 적용 */
+html.smooth-scroll {
+  scroll-behavior: smooth;
 }
 
 body {

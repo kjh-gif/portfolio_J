@@ -11,6 +11,13 @@ if ('scrollRestoration' in history) {
 let cachedWorkPosts = []; // 로드된 게시글 캐시 (속도 개선용)
 let isUserLoggedIn = false; // 로그인 상태 캐시 (속도 개선용)
 
+// 페이지 로드 시 해시가 있으면 스크롤을 즉시 맨 위로 고정
+if (window.location.hash) {
+  // CSS scroll-behavior 완전 비활성화 (브라우저 자동 스크롤 방지)
+  document.documentElement.style.scrollBehavior = 'auto';
+  window.scrollTo(0, 0);
+}
+
 // DOM이 로드된 후 실행
 document.addEventListener('DOMContentLoaded', async function() {
 
@@ -20,7 +27,11 @@ document.addEventListener('DOMContentLoaded', async function() {
   // 게시글 목록 로드
   await loadWorkPosts();
 
-  // 부드러운 스크롤 효과
+  // URL 해시 처리 (다른 페이지에서 이동 시)
+  // 게시글 로드 후 즉시 실행하여 정확한 위치 계산
+  await handleUrlHash();
+
+  // 부드러운 스크롤 효과 (해시 처리 후 활성화)
   initSmoothScroll();
 
   // 스크롤 시 헤더 스타일 변경
@@ -29,42 +40,41 @@ document.addEventListener('DOMContentLoaded', async function() {
   // 작업물 카드 클릭 이벤트
   initWorkCards();
 
-  // URL 해시 처리 (다른 페이지에서 이동 시)
-  // 모든 콘텐츠 로드 후 실행하여 정확한 위치 계산
-  handleUrlHash();
-
 });
 
 // ==========================================
 // URL 해시 처리 (페이지 로드 시)
 // ==========================================
-function handleUrlHash() {
+async function handleUrlHash() {
   // URL에 해시가 있는지 확인
   const hash = window.location.hash;
 
   if (hash) {
-    // 페이지 로드 시 즉시 맨 위로 이동 (깜빡임 방지)
-    window.scrollTo(0, 0);
-
     // 해시에서 # 제거
     const targetId = hash.substring(1);
     const targetElement = document.getElementById(targetId);
 
     if (targetElement) {
-      // 짧은 지연 후 정확한 위치로 즉시 이동
-      // requestAnimationFrame으로 레이아웃 계산 완료 후 실행
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          const headerHeight = 80; // 헤더 높이
-          const targetPosition = targetElement.offsetTop - headerHeight;
+      // 약간의 지연으로 레이아웃 안정화 대기
+      await new Promise(resolve => setTimeout(resolve, 50));
 
-          window.scrollTo({
-            top: targetPosition,
-            behavior: 'auto' // 즉시 이동으로 중간 과정 없음
-          });
-        });
+      // 정확한 위치 계산 및 즉시 이동
+      const headerHeight = 80; // 헤더 높이
+      const targetPosition = targetElement.offsetTop - headerHeight;
+
+      window.scrollTo({
+        top: targetPosition,
+        behavior: 'auto' // 즉시 이동 (끊김 없음)
       });
+
+      // 해시 네비게이션 완료 후 smooth scroll 활성화
+      setTimeout(() => {
+        document.documentElement.classList.add('smooth-scroll');
+      }, 100);
     }
+  } else {
+    // 해시가 없으면 바로 smooth scroll 활성화
+    document.documentElement.classList.add('smooth-scroll');
   }
 }
 
