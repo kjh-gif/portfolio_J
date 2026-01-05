@@ -343,6 +343,7 @@ section {
   max-width: var(--max-width);
   margin-left: auto;
   margin-right: auto;
+  padding: 0 var(--spacing-md);
 }
 
 .contact-content {
@@ -352,6 +353,7 @@ section {
   max-width: var(--max-width);
   margin-left: auto;
   margin-right: auto;
+  padding: 0 var(--spacing-md);
 }
 
 .contact-description {
