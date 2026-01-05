@@ -122,7 +122,7 @@ header .header-container nav {
 header .logo {
   font-size: 24px;
   font-weight: var(--font-weight-bold);
-  color: #c2b5a6;
+  color: #a89e94;
 }
 
 /* 네비게이션 */
@@ -134,13 +134,13 @@ nav {
 nav a {
   font-size: 18px;
   font-weight: var(--font-weight-normal);
-  color: #c2b5a6;
+  color: #a89e94;
   transition: color 0.3s ease;
   position: relative;
 }
 
 nav a:hover {
-  color: #a8988a;
+  color: #8d857c;
 }
 
 nav a::after {
