@@ -134,7 +134,7 @@ nav {
 nav a {
   font-size: 18px;
   font-weight: var(--font-weight-normal);
-  color: var(--color-text);
+  color: #A6A196;
   transition: color 0.3s ease;
   position: relative;
 }
