@@ -499,6 +499,17 @@ footer p {
     grid-template-columns: 1fr;
   }
 
+  .work-card,
+  .post-card {
+    aspect-ratio: auto;
+  }
+
+  .work-card img,
+  .post-card img {
+    height: auto;
+    max-height: 300px;
+  }
+
   section {
     padding: var(--spacing-lg) var(--spacing-sm);
   }
