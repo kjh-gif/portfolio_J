@@ -2,6 +2,11 @@
 // 메인 JavaScript
 // ==========================================
 
+// 브라우저 자동 스크롤 복원 방지 (해시 네비게이션 제어용)
+if ('scrollRestoration' in history) {
+  history.scrollRestoration = 'manual';
+}
+
 // 전역 변수
 let cachedWorkPosts = []; // 로드된 게시글 캐시 (속도 개선용)
 let isUserLoggedIn = false; // 로그인 상태 캐시 (속도 개선용)
@@ -25,6 +30,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   initWorkCards();
 
   // URL 해시 처리 (다른 페이지에서 이동 시)
+  // 모든 콘텐츠 로드 후 실행하여 정확한 위치 계산
   handleUrlHash();
 
 });
@@ -37,18 +43,26 @@ function handleUrlHash() {
   const hash = window.location.hash;
 
   if (hash) {
+    // 페이지 로드 시 즉시 맨 위로 이동 (깜빡임 방지)
+    window.scrollTo(0, 0);
+
     // 해시에서 # 제거
     const targetId = hash.substring(1);
     const targetElement = document.getElementById(targetId);
 
     if (targetElement) {
-      // 즉시 스크롤로 중간 과정 없이 바로 이동
-      const headerHeight = 80; // 헤더 높이
-      const targetPosition = targetElement.offsetTop - headerHeight;
+      // 짧은 지연 후 정확한 위치로 즉시 이동
+      // requestAnimationFrame으로 레이아웃 계산 완료 후 실행
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const headerHeight = 80; // 헤더 높이
+          const targetPosition = targetElement.offsetTop - headerHeight;
 
-      window.scrollTo({
-        top: targetPosition,
-        behavior: 'auto' // smooth 대신 auto로 즉시 이동
+          window.scrollTo({
+            top: targetPosition,
+            behavior: 'auto' // 즉시 이동으로 중간 과정 없음
+          });
+        });
       });
     }
   }
