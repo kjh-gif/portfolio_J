@@ -251,7 +251,7 @@ section {
   font-size: 32px;
   font-weight: var(--font-weight-bold);
   color: var(--color-point);
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: 24px;
 }
 
 .work-grid {
@@ -326,7 +326,7 @@ section {
   font-size: 32px;
   font-weight: var(--font-weight-bold);
   color: var(--color-point);
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: 24px;
   max-width: var(--max-width);
   margin-left: auto;
   margin-right: auto;
@@ -345,7 +345,7 @@ section {
   font-size: 20px;
   color: var(--color-text);
   line-height: 1.6;
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: 24px;
 }
 
 .contact-info {
