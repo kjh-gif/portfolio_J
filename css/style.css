@@ -254,6 +254,10 @@ section {
   margin-bottom: 24px;
 }
 
+.work-section > p {
+  color: #605D5D;
+}
+
 .work-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -343,7 +347,7 @@ section {
 
 .contact-description {
   font-size: 20px;
-  color: var(--color-text);
+  color: #605D5D;
   line-height: 1.6;
   margin-bottom: 21px;
 }
@@ -355,7 +359,7 @@ section {
 }
 
 .contact-info a {
-  color: var(--color-point);
+  color: #605D5D;
   text-decoration: underline;
   transition: color 0.3s ease;
 }
