@@ -7,6 +7,7 @@
 @font-face {
   font-family: 'Pretendard';
   font-display: swap;
+  src: local('Pretendard');
 }
 
 /* ==========================================
@@ -142,6 +143,8 @@ nav a {
   font-size: 18px;
   font-weight: var(--font-weight-normal);
   color: #3A332E;
+  -webkit-transition: color 0.3s ease;
+  -o-transition: color 0.3s ease;
   transition: color 0.3s ease;
   position: relative;
 }
@@ -158,6 +161,8 @@ nav a::after {
   width: 0;
   height: 2px;
   background-color: #6B4E3D;
+  -webkit-transition: width 0.3s ease;
+  -o-transition: width 0.3s ease;
   transition: width 0.3s ease;
 }
 
@@ -240,11 +245,15 @@ section {
   font-size: 16px;
   font-weight: var(--font-weight-bold);
   border-radius: 8px;
+  -webkit-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
   transition: all 0.3s ease;
 }
 
 .hero-section .cta-button:hover {
   background-color: #5A4031;
+  -webkit-transform: translateY(-2px);
+  -ms-transform: translateY(-2px);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
@@ -273,6 +282,8 @@ section {
   font-weight: var(--font-weight-bold);
   color: #3A332E;
   text-decoration: none;
+  -webkit-transition: color 200ms ease;
+  -o-transition: color 200ms ease;
   transition: color 200ms ease;
 }
 
@@ -282,15 +293,21 @@ section {
 
 .work-cta .arrow {
   display: inline-block;
+  -webkit-transition: transform 200ms ease;
+  -o-transition: transform 200ms ease;
   transition: transform 200ms ease;
 }
 
 .work-cta:hover .arrow {
+  -webkit-transform: translateX(4px);
+  -ms-transform: translateX(4px);
   transform: translateX(4px);
 }
 
 .work-grid {
+  display: -ms-grid;
   display: grid;
+  -ms-grid-columns: 1fr 40px 1fr 40px 1fr;
   grid-template-columns: repeat(3, 1fr);
   gap: 40px;
   margin-top: var(--spacing-lg);
@@ -300,6 +317,8 @@ section {
   background-color: var(--color-sub-main-2);
   border-radius: 12px;
   overflow: hidden;
+  -webkit-transition: transform 0.3s ease, box-shadow 0.3s ease;
+  -o-transition: transform 0.3s ease, box-shadow 0.3s ease;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
   width: 100%;
@@ -309,6 +328,8 @@ section {
 }
 
 .work-card:hover {
+  -webkit-transform: translateY(-8px);
+  -ms-transform: translateY(-8px);
   transform: translateY(-8px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
@@ -401,6 +422,8 @@ section {
 .contact-info a {
   color: #5C5752;
   text-decoration: underline;
+  -webkit-transition: color 0.3s ease;
+  -o-transition: color 0.3s ease;
   transition: color 0.3s ease;
 }
 
@@ -651,6 +674,8 @@ footer p {
 .btn-login:hover,
 .btn-submit:hover {
   background-color: #2a2a2a;
+  -webkit-transform: translateY(-2px);
+  -ms-transform: translateY(-2px);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
@@ -705,6 +730,8 @@ footer p {
 
 .btn-login-link:hover {
   background-color: #2a2a2a;
+  -webkit-transform: translateY(-1px);
+  -ms-transform: translateY(-1px);
   transform: translateY(-1px);
 }
 
@@ -842,7 +869,9 @@ footer p {
   margin: 0 auto;
   padding: 0 var(--spacing-md);
   padding-top: var(--spacing-md);
+  display: -ms-grid;
   display: grid;
+  -ms-grid-columns: 1fr 40px 1fr 40px 1fr;
   grid-template-columns: repeat(3, 1fr);
   gap: 40px;
 }
@@ -852,6 +881,8 @@ footer p {
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
+  -webkit-transition: transform 0.3s ease, box-shadow 0.3s ease;
+  -o-transition: transform 0.3s ease, box-shadow 0.3s ease;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   width: 100%;
   height: auto;
@@ -860,6 +891,8 @@ footer p {
 }
 
 .post-card:hover {
+  -webkit-transform: translateY(-8px);
+  -ms-transform: translateY(-8px);
   transform: translateY(-8px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
