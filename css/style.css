@@ -67,6 +67,10 @@ html.smooth-scroll {
 body {
   font-family: var(--font-family);
   font-size: var(--font-size-base);
+  opacity: 1;
+  -webkit-transition: opacity 0.3s ease;
+  -o-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
   font-weight: var(--font-weight-normal);
   color: var(--color-text);
   line-height: 1.6;

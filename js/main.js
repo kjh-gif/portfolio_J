@@ -16,6 +16,9 @@ if (window.location.hash) {
   // CSS scroll-behavior 완전 비활성화 (브라우저 자동 스크롤 방지)
   document.documentElement.style.scrollBehavior = 'auto';
   window.scrollTo(0, 0);
+
+  // 부드러운 전환을 위해 페이지를 투명하게 시작
+  document.body.style.opacity = '0';
 }
 
 // DOM이 로드된 후 실행
@@ -65,6 +68,11 @@ async function handleUrlHash() {
       window.scrollTo({
         top: targetPosition,
         behavior: 'auto' // 즉시 이동 (끊김 없음)
+      });
+
+      // 위치 이동 후 페이드 인 효과로 부드럽게 표시
+      requestAnimationFrame(() => {
+        document.body.style.opacity = '1';
       });
 
       // 해시 네비게이션 완료 후 smooth scroll 활성화
