@@ -123,7 +123,7 @@ header .header-container nav {
 header .logo {
   font-size: 24px;
   font-weight: var(--font-weight-bold);
-  color: #a89e94;
+  color: #3A332E;
 }
 
 /* 네비게이션 */
@@ -135,13 +135,13 @@ nav {
 nav a {
   font-size: 18px;
   font-weight: var(--font-weight-normal);
-  color: #a89e94;
+  color: #3A332E;
   transition: color 0.3s ease;
   position: relative;
 }
 
 nav a:hover {
-  color: #8d857c;
+  color: #6B4E3D;
 }
 
 nav a::after {
@@ -151,7 +151,7 @@ nav a::after {
   left: 0;
   width: 0;
   height: 2px;
-  background-color: var(--color-point);
+  background-color: #6B4E3D;
   transition: width 0.3s ease;
 }
 
@@ -229,8 +229,8 @@ section {
 
 .hero-section .cta-button {
   padding: 14px 36px;
-  background-color: #D5C8B7;
-  color: #ffffff;
+  background-color: #6B4E3D;
+  color: #FFFFFF;
   font-size: 16px;
   font-weight: var(--font-weight-bold);
   border-radius: 8px;
@@ -238,7 +238,7 @@ section {
 }
 
 .hero-section .cta-button:hover {
-  background-color: #c5b5a3;
+  background-color: #5A4031;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
