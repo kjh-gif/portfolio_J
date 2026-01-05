@@ -260,6 +260,29 @@ section {
   color: #605D5D;
 }
 
+/* Work 섹션 CTA */
+.work-cta {
+  display: inline-block;
+  font-size: 18px;
+  font-weight: var(--font-weight-bold);
+  color: #3A332E;
+  text-decoration: none;
+  transition: color 200ms ease;
+}
+
+.work-cta:hover {
+  color: #6B4E3D;
+}
+
+.work-cta .arrow {
+  display: inline-block;
+  transition: transform 200ms ease;
+}
+
+.work-cta:hover .arrow {
+  transform: translateX(4px);
+}
+
 .work-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
