@@ -94,6 +94,7 @@ header {
   height: var(--header-height);
   background-color: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   z-index: 1000;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
@@ -312,13 +313,20 @@ section {
   -webkit-box-orient: vertical;
   word-break: break-word;
   line-height: 1.4;
+  min-height: 50px;
 }
 
 .work-card p {
   font-size: 14px;
   color: #756A54;
   line-height: 1.5;
-  overflow: visible;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
 }
 
 /* Contact 섹션 */
@@ -426,6 +434,12 @@ footer p {
   .work-section h2,
   .contact-section h2 {
     font-size: 32px;
+  }
+
+  .work-grid,
+  .post-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
   }
 }
 
@@ -814,13 +828,20 @@ footer p {
   -webkit-box-orient: vertical;
   word-break: break-word;
   line-height: 1.4;
+  min-height: 50px;
 }
 
 .post-card p {
   font-size: 14px;
   color: #756A54;
   line-height: 1.5;
-  overflow: visible;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
 }
 
 /* 모달 */
