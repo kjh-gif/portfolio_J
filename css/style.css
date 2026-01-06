@@ -1002,6 +1002,23 @@ footer p {
   image-rendering: auto;
 }
 
+/* 이미지 로딩 스켈레톤 애니메이션 */
+@keyframes skeleton-loading {
+  0% {
+    background-color: #f0f0f0;
+  }
+  50% {
+    background-color: #e0e0e0;
+  }
+  100% {
+    background-color: #f0f0f0;
+  }
+}
+
+#detailImages > div {
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
 .modal.show .modal-content {
   -webkit-transform: scale(1);
   -ms-transform: scale(1);

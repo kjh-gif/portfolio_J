@@ -295,7 +295,7 @@ async function openDetailModal(postId) {
 
   // 3. 로딩 상태 표시
   detailTitle.textContent = '로딩 중...';
-  detailImages.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">이미지를 불러오는 중...</div>';
+  detailImages.innerHTML = '';
   detailContent.textContent = '';
 
   try {
@@ -323,7 +323,7 @@ async function openDetailModal(postId) {
     // 4. 데이터로 내용 채우기
     detailTitle.textContent = post.title;
 
-    // 이미지들 표시 (위에서 아래로) - 프리로딩으로 최적화
+    // 이미지들 표시 (위에서 아래로) - 프로그레시브 로딩
     if (post.image_url) {
       let imageUrls = [];
       if (typeof post.image_url === 'string') {
@@ -336,29 +336,52 @@ async function openDetailModal(postId) {
         imageUrls = post.image_url;
       }
 
-      // 모든 이미지 프리로딩 (태블릿 성능 개선)
-      const imagePromises = imageUrls.map(url => {
-        return new Promise((resolve) => {
-          const img = new Image();
-          img.onload = () => resolve(img);
-          img.onerror = () => resolve(img); // 에러여도 계속 진행
-          img.src = url;
-          img.alt = post.title;
-          img.style.width = '100%';
-          img.style.marginBottom = '8px';
-          img.style.borderRadius = '8px';
-        });
-      });
+      // 로딩 상태 초기화
+      detailImages.innerHTML = '';
 
-      // 모든 이미지 로드 완료 후 한 번에 DOM 추가
-      const loadedImages = await Promise.all(imagePromises);
+      // 각 이미지를 스켈레톤과 함께 즉시 추가 (프로그레시브 로딩)
+      imageUrls.forEach((url, index) => {
+        // 이미지 컨테이너 생성
+        const imgContainer = document.createElement('div');
+        imgContainer.style.cssText = 'position: relative; width: 100%; margin-bottom: 8px; background-color: #f0f0f0; border-radius: 8px; min-height: 400px;';
 
-      // DocumentFragment로 한 번에 추가 (레이아웃 재계산 최소화)
-      const fragment = document.createDocumentFragment();
-      loadedImages.forEach(img => {
-        fragment.appendChild(img);
+        // 로딩 스피너
+        const loader = document.createElement('div');
+        loader.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #999; font-size: 14px;';
+        loader.textContent = '이미지 로딩 중...';
+        imgContainer.appendChild(loader);
+
+        // 이미지 생성
+        const img = new Image();
+        img.style.cssText = 'width: 100%; border-radius: 8px; display: none; opacity: 0; transition: opacity 0.3s ease;';
+        img.alt = post.title;
+
+        img.onload = () => {
+          // 로딩 완료 - 스피너 제거, 이미지 표시
+          loader.remove();
+          img.style.display = 'block';
+          imgContainer.style.minHeight = 'auto';
+          imgContainer.style.backgroundColor = 'transparent';
+          imgContainer.style.animation = 'none'; // 스켈레톤 애니메이션 중지
+          // 페이드 인 효과
+          setTimeout(() => {
+            img.style.opacity = '1';
+          }, 10);
+        };
+
+        img.onerror = () => {
+          // 에러 시 스피너 제거, 에러 메시지 표시
+          loader.textContent = '이미지 로드 실패';
+          imgContainer.style.minHeight = '100px';
+          imgContainer.style.animation = 'none'; // 스켈레톤 애니메이션 중지
+        };
+
+        imgContainer.appendChild(img);
+        detailImages.appendChild(imgContainer);
+
+        // 이미지 로드 시작
+        img.src = url;
       });
-      detailImages.appendChild(fragment);
     }
 
     // 내용 표시
