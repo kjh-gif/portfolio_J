@@ -416,17 +416,21 @@ async function openDetailModal(postId) {
 // 모달 닫기 함수 (부드러운 애니메이션 + 성능 최적화)
 function closeDetailModalWithAnimation() {
   const detailModal = document.getElementById('detailModal');
+  const detailImages = document.getElementById('detailImages');
 
-  // requestAnimationFrame으로 비동기 처리 (성능 개선)
-  requestAnimationFrame(() => {
-    // show 클래스 제거로 페이드 아웃
-    detailModal.classList.remove('show');
+  // show 클래스 제거로 페이드 아웃 (즉시 실행)
+  detailModal.classList.remove('show');
 
-    // 애니메이션 완료 후 display none
-    setTimeout(() => {
-      detailModal.style.display = 'none';
-    }, 200);
-  });
+  // 애니메이션 완료 후 처리 (비동기)
+  setTimeout(() => {
+    // DOM 정리 (메모리 해제)
+    if (detailImages) {
+      detailImages.innerHTML = '';
+    }
+
+    // 모달 숨김
+    detailModal.style.display = 'none';
+  }, 200);
 }
 
 // 상세보기 모달 닫기 이벤트 (DOMContentLoaded 후)
@@ -436,11 +440,11 @@ document.addEventListener('DOMContentLoaded', function() {
   const btnCloseDetail = document.getElementById('btnCloseDetail');
 
   if (closeDetailModal) {
-    closeDetailModal.addEventListener('click', closeDetailModalWithAnimation);
+    closeDetailModal.addEventListener('click', closeDetailModalWithAnimation, { passive: true });
   }
 
   if (btnCloseDetail) {
-    btnCloseDetail.addEventListener('click', closeDetailModalWithAnimation);
+    btnCloseDetail.addEventListener('click', closeDetailModalWithAnimation, { passive: true });
   }
 
   // 모달 외부 클릭 시 닫기 (성능 최적화: window 대신 모달에 직접 등록)
@@ -449,6 +453,6 @@ document.addEventListener('DOMContentLoaded', function() {
       if (e.target === detailModal) {
         closeDetailModalWithAnimation();
       }
-    });
+    }, { passive: true });
   }
 });
