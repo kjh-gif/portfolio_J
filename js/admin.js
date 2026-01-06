@@ -186,23 +186,21 @@ document.addEventListener('DOMContentLoaded', async function() {
   const btnCloseDetail = document.getElementById('btnCloseDetail');
 
   if (closeDetailModal) {
-    closeDetailModal.addEventListener('click', function() {
-      detailModal.style.display = 'none';
-    });
+    closeDetailModal.addEventListener('click', closeDetailModalWithAnimation, { passive: true });
   }
 
   if (btnCloseDetail) {
-    btnCloseDetail.addEventListener('click', function() {
-      detailModal.style.display = 'none';
-    });
+    btnCloseDetail.addEventListener('click', closeDetailModalWithAnimation, { passive: true });
   }
 
-  // 상세보기 모달 외부 클릭 시 닫기
-  window.addEventListener('click', function(e) {
-    if (e.target === detailModal) {
-      detailModal.style.display = 'none';
-    }
-  });
+  // 모달 외부 클릭 시 닫기 (성능 최적화: window 대신 모달에 직접 등록)
+  if (detailModal) {
+    detailModal.addEventListener('click', function(e) {
+      if (e.target === detailModal) {
+        closeDetailModalWithAnimation();
+      }
+    }, { passive: true });
+  }
 
   // URL 해시가 있으면 해당 게시글 상세보기 열기
   const hash = window.location.hash;
@@ -398,11 +396,16 @@ async function openDetailModal(postId) {
   const detailContent = document.getElementById('detailContent');
   const detailAdminButtons = document.getElementById('detailAdminButtons');
 
-  // 1. 모달을 즉시 표시 (속도 개선 핵심)
+  // 1. 모달을 즉시 표시 (부드러운 애니메이션)
   detailModal.style.display = 'flex';
 
-  // 2. 로딩 상태 표시
-  detailTitle.textContent = '로딩 중...';
+  // 2. 애니메이션을 위해 show 클래스 추가
+  requestAnimationFrame(() => {
+    detailModal.classList.add('show');
+  });
+
+  // 3. 로딩 상태 초기화
+  detailTitle.textContent = '';
   detailImages.innerHTML = '';
   detailContent.textContent = '';
 
@@ -420,7 +423,7 @@ async function openDetailModal(postId) {
 
       if (error) {
         console.error('Error fetching post:', error);
-        detailModal.style.display = 'none';
+        closeDetailModalWithAnimation();
         alert('게시글을 불러오는데 실패했습니다.');
         return;
       }
@@ -431,7 +434,7 @@ async function openDetailModal(postId) {
     // 4. 데이터로 내용 채우기
     detailTitle.textContent = post.title;
 
-    // 이미지들 표시 (위에서 아래로)
+    // 이미지들 표시 (위에서 아래로) - 프로그레시브 로딩
     if (post.image_url) {
       let imageUrls = [];
       if (typeof post.image_url === 'string') {
@@ -444,14 +447,51 @@ async function openDetailModal(postId) {
         imageUrls = post.image_url;
       }
 
-      imageUrls.forEach(url => {
-        const img = document.createElement('img');
-        img.src = url;
+      // 로딩 상태 초기화
+      detailImages.innerHTML = '';
+
+      // 각 이미지를 스켈레톤과 함께 즉시 추가 (프로그레시브 로딩)
+      imageUrls.forEach((url, index) => {
+        // 이미지 컨테이너 생성
+        const imgContainer = document.createElement('div');
+        imgContainer.style.cssText = 'position: relative; width: 100%; margin-bottom: 8px; background-color: #f0f0f0; border-radius: 8px; min-height: 400px;';
+
+        // 로딩 스피너
+        const loader = document.createElement('div');
+        loader.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #999; font-size: 14px;';
+        loader.textContent = '이미지 로딩 중...';
+        imgContainer.appendChild(loader);
+
+        // 이미지 생성
+        const img = new Image();
+        img.style.cssText = 'width: 100%; border-radius: 8px; display: none; opacity: 0; transition: opacity 0.3s ease;';
         img.alt = post.title;
-        img.style.width = '100%';
-        img.style.marginBottom = '8px';
-        img.style.borderRadius = '8px';
-        detailImages.appendChild(img);
+
+        img.onload = () => {
+          // 로딩 완료 - 스피너 제거, 이미지 표시
+          loader.remove();
+          img.style.display = 'block';
+          imgContainer.style.minHeight = 'auto';
+          imgContainer.style.backgroundColor = 'transparent';
+          imgContainer.style.animation = 'none'; // 스켈레톤 애니메이션 중지
+          // 페이드 인 효과
+          setTimeout(() => {
+            img.style.opacity = '1';
+          }, 10);
+        };
+
+        img.onerror = () => {
+          // 에러 시 스피너 제거, 에러 메시지 표시
+          loader.textContent = '이미지 로드 실패';
+          imgContainer.style.minHeight = '100px';
+          imgContainer.style.animation = 'none'; // 스켈레톤 애니메이션 중지
+        };
+
+        imgContainer.appendChild(img);
+        detailImages.appendChild(imgContainer);
+
+        // 이미지 로드 시작
+        img.src = url;
       });
     }
 
@@ -464,7 +504,7 @@ async function openDetailModal(postId) {
     // 수정 버튼 이벤트
     const btnEditFromDetail = document.getElementById('btnEditFromDetail');
     btnEditFromDetail.onclick = async function() {
-      detailModal.style.display = 'none';
+      closeDetailModalWithAnimation();
       await openEditModal(postId);
     };
 
@@ -472,14 +512,34 @@ async function openDetailModal(postId) {
     const btnDeleteFromDetail = document.getElementById('btnDeleteFromDetail');
     btnDeleteFromDetail.onclick = async function() {
       await deletePost(postId, post.image_url);
-      detailModal.style.display = 'none';
+      closeDetailModalWithAnimation();
     };
 
   } catch (err) {
     console.error('Error:', err);
-    detailModal.style.display = 'none';
+    closeDetailModalWithAnimation();
     alert('오류가 발생했습니다.');
   }
+}
+
+// 모달 닫기 함수 (부드러운 애니메이션 + 성능 최적화)
+function closeDetailModalWithAnimation() {
+  const detailModal = document.getElementById('detailModal');
+  const detailImages = document.getElementById('detailImages');
+
+  // show 클래스 제거로 페이드 아웃 (즉시 실행)
+  detailModal.classList.remove('show');
+
+  // 애니메이션 완료 후 처리 (비동기)
+  setTimeout(() => {
+    // DOM 정리 (메모리 해제)
+    if (detailImages) {
+      detailImages.innerHTML = '';
+    }
+
+    // 모달 숨김
+    detailModal.style.display = 'none';
+  }, 200);
 }
 
 // ==========================================
