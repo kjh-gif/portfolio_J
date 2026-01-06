@@ -451,7 +451,7 @@ async function openDetailModal(postId) {
       detailImages.innerHTML = '';
 
       // 각 이미지를 스켈레톤과 함께 즉시 추가 (프로그레시브 로딩)
-      imageUrls.forEach((url, index) => {
+      imageUrls.forEach((url) => {
         // 이미지 컨테이너 생성
         const imgContainer = document.createElement('div');
         imgContainer.style.cssText = 'position: relative; width: 100%; margin-bottom: 8px; background-color: #f0f0f0; border-radius: 8px; min-height: 400px;';
