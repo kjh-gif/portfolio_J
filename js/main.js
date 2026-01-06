@@ -293,8 +293,8 @@ async function openDetailModal(postId) {
     detailModal.classList.add('show');
   });
 
-  // 3. 로딩 상태 표시
-  detailTitle.textContent = '로딩 중...';
+  // 3. 로딩 상태 초기화
+  detailTitle.textContent = '';
   detailImages.innerHTML = '';
   detailContent.textContent = '';
 
