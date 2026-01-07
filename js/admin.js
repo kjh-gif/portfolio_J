@@ -19,6 +19,7 @@ window.addEventListener('unhandledrejection', function(e) {
 });
 
 // 전역 변수
+let supabaseClient = null; // Supabase 클라이언트 (지연 초기화)
 let currentEditingPostId = null;
 let uploadedImageFiles = []; // 최대 3개까지 (File 객체 배열)
 let uploadedThumbnailFile = null; // 썸네일 이미지
@@ -43,26 +44,26 @@ if (document.readyState === 'loading') {
 }
 
 async function initAdminPage() {
-  console.log('=== DOMContentLoaded 시작 ===');
+  console.log('=== initAdminPage 시작 ===');
 
-  // Supabase 클라이언트 확인
-  console.log('0. Supabase 클라이언트 확인...');
-  console.log('- window.supabase:', typeof window.supabase);
-  console.log('- supabaseClient:', typeof supabaseClient);
+  // Supabase 클라이언트 초기화
+  console.log('0. Supabase 클라이언트 초기화 중...');
 
-  if (typeof window.supabase === 'undefined') {
-    console.error('❌ Supabase 라이브러리가 로드되지 않았습니다!');
-    alert('페이지 로딩에 실패했습니다. 새로고침 해주세요.');
+  try {
+    // supabase-client.js의 initSupabaseClient() 호출
+    if (typeof initSupabaseClient === 'function') {
+      supabaseClient = initSupabaseClient();
+      console.log('✓ Supabase 클라이언트 초기화 완료');
+    } else {
+      console.error('❌ initSupabaseClient 함수를 찾을 수 없습니다!');
+      alert('페이지 초기화에 실패했습니다. 새로고침 해주세요.');
+      return;
+    }
+  } catch (error) {
+    console.error('❌ Supabase 초기화 실패:', error);
+    alert('Supabase 초기화에 실패했습니다: ' + error.message);
     return;
   }
-
-  if (typeof supabaseClient === 'undefined') {
-    console.error('❌ Supabase 클라이언트가 초기화되지 않았습니다!');
-    alert('페이지 초기화에 실패했습니다. 새로고침 해주세요.');
-    return;
-  }
-
-  console.log('✓ Supabase 준비 완료');
 
   try {
     // 관리자 권한 체크 (페이지 접근 제어)
