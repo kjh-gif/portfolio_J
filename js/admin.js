@@ -2,20 +2,13 @@
 // 관리자 페이지 JavaScript
 // ==========================================
 
-console.log('>>> admin.js 파일 로드 시작 <<<');
-
-// 전역 에러 핸들러 (디버깅용)
+// 전역 에러 핸들러 (간소화)
 window.addEventListener('error', function(e) {
-  console.error('❌❌❌ 전역 JavaScript 에러 발생 ❌❌❌');
-  console.error('에러 메시지:', e.message);
-  console.error('파일:', e.filename);
-  console.error('라인:', e.lineno, '컬럼:', e.colno);
-  console.error('에러 객체:', e.error);
+  console.error('JavaScript 에러:', e.message, 'at', e.filename, e.lineno);
 });
 
 window.addEventListener('unhandledrejection', function(e) {
-  console.error('❌❌❌ Promise 거부 발생 ❌❌❌');
-  console.error('거부 사유:', e.reason);
+  console.error('Promise 에러:', e.reason);
 });
 
 // 전역 변수
@@ -31,69 +24,50 @@ let currentPage = 1; // 현재 페이지
 let totalPages = 1; // 전체 페이지 수
 let allPosts = []; // 전체 게시글 (필터링 전)
 
-console.log('>>> 전역 변수 선언 완료 <<<');
-console.log('>>> DOMContentLoaded 이벤트 리스너 등록 시작 <<<');
-
 // DOMContentLoaded가 이미 발생했을 수도 있으므로 체크
 if (document.readyState === 'loading') {
-  console.log('>>> 문서 로딩 중 - DOMContentLoaded 이벤트를 기다립니다 <<<');
   document.addEventListener('DOMContentLoaded', initAdminPage);
 } else {
-  console.log('>>> 문서 이미 로드됨 - 즉시 초기화 시작 <<<');
   initAdminPage();
 }
 
 async function initAdminPage() {
-  console.log('=== initAdminPage 시작 ===');
-
   // Supabase 클라이언트 초기화
-  console.log('0. Supabase 클라이언트 초기화 중...');
-
   try {
-    // supabase-client.js의 initSupabaseClient() 호출
     if (typeof initSupabaseClient === 'function') {
       supabaseClient = initSupabaseClient();
-      console.log('✓ Supabase 클라이언트 초기화 완료');
     } else {
-      console.error('❌ initSupabaseClient 함수를 찾을 수 없습니다!');
+      console.error('initSupabaseClient 함수를 찾을 수 없습니다');
       alert('페이지 초기화에 실패했습니다. 새로고침 해주세요.');
       return;
     }
   } catch (error) {
-    console.error('❌ Supabase 초기화 실패:', error);
+    console.error('Supabase 초기화 실패:', error);
     alert('Supabase 초기화에 실패했습니다: ' + error.message);
     return;
   }
 
   try {
-    // 관리자 권한 체크 (페이지 접근 제어)
-    console.log('1. 로그인 상태 확인 중...');
+    // 관리자 권한 체크
     const isLoggedIn = await checkAuth();
-    console.log('로그인 상태:', isLoggedIn);
-
     if (!isLoggedIn) {
       alert('로그인이 필요합니다.');
       window.location.href = 'login.html';
       return;
     }
 
-    console.log('2. 사용자 정보 가져오는 중...');
     const user = await getCurrentUser();
-    console.log('사용자:', user);
-
     if (!user) {
       alert('로그인이 필요합니다.');
       window.location.href = 'login.html';
       return;
     }
   } catch (error) {
-    console.error('인증 확인 중 에러 발생:', error);
+    console.error('인증 확인 중 에러:', error);
     alert('인증 확인 중 오류가 발생했습니다: ' + error.message);
-    // 에러가 발생해도 계속 진행 (이벤트 리스너는 등록되도록)
   }
 
   // UI 요소
-  console.log('3. UI 요소 가져오는 중...');
   const logoutBtn = document.getElementById('logoutBtn');
   const writeBtn = document.getElementById('writeBtn');
   const postModal = document.getElementById('postModal');
@@ -104,91 +78,39 @@ async function initAdminPage() {
   const searchBtn = document.getElementById('searchBtn');
   const searchInput = document.getElementById('searchInput');
 
-  console.log('UI 요소 확인:');
-  console.log('- logoutBtn:', logoutBtn);
-  console.log('- writeBtn:', writeBtn);
-  console.log('- postModal:', postModal);
-  console.log('- postForm:', postForm);
-
   // 로그아웃 버튼 이벤트
-  console.log('4. 로그아웃 버튼 이벤트 등록 중...');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', async function() {
       try {
         const { error } = await supabaseClient.auth.signOut();
-
         if (error) {
           console.error('Logout error:', error);
           alert('로그아웃에 실패했습니다.');
           return;
         }
-
         alert('로그아웃되었습니다.');
         window.location.href = 'index.html';
-
       } catch (err) {
         console.error('Error:', err);
         alert('오류가 발생했습니다.');
       }
     });
-    console.log('✓ 로그아웃 버튼 이벤트 등록 완료');
   }
 
   // 게시글 목록 로드
-  console.log('5. 게시글 목록 로드 중...');
   try {
     await loadPosts();
-    console.log('✓ 게시글 목록 로드 완료');
   } catch (error) {
-    console.error('게시글 로드 중 에러 발생:', error);
-    // 에러가 발생해도 계속 진행
+    console.error('게시글 로드 중 에러:', error);
   }
 
-  // 글쓰기 링크 클릭 (이벤트 위임 방식)
-  console.log('6. Write 버튼 이벤트 등록 중...');
-
-  // 방법 1: 직접 이벤트 등록
+  // Write 버튼 클릭 이벤트 (최적화: 단일 이벤트 리스너)
   if (writeBtn) {
-    console.log('Write 버튼 발견:', writeBtn);
-    console.log('Write 버튼 tagName:', writeBtn.tagName);
-    console.log('Write 버튼 id:', writeBtn.id);
-    console.log('Write 버튼 className:', writeBtn.className);
-
-    // 기존 이벤트 리스너 제거 (혹시 중복 방지)
-    const newWriteBtn = writeBtn.cloneNode(true);
-    writeBtn.parentNode.replaceChild(newWriteBtn, writeBtn);
-
-    newWriteBtn.addEventListener('click', function(e) {
-      console.log('=== Write 버튼 클릭됨 ===');
+    writeBtn.addEventListener('click', function(e) {
       e.preventDefault();
-      e.stopPropagation();
-      try {
-        openPostModal();
-      } catch (error) {
-        console.error('openPostModal 실행 중 에러:', error);
-        alert('모달을 여는 중 오류가 발생했습니다: ' + error.message);
-      }
-    }, true); // useCapture = true
-
-    console.log('✓ Write 버튼 이벤트 등록 완료');
-  } else {
-    console.error('❌ writeBtn 요소를 찾을 수 없습니다!');
+      openPostModal();
+    });
   }
-
-  // 방법 2: 이벤트 위임 (백업)
-  document.body.addEventListener('click', function(e) {
-    if (e.target && e.target.id === 'writeBtn') {
-      console.log('=== Write 버튼 클릭됨 (이벤트 위임) ===');
-      e.preventDefault();
-      e.stopPropagation();
-      try {
-        openPostModal();
-      } catch (error) {
-        console.error('openPostModal 실행 중 에러:', error);
-        alert('모달을 여는 중 오류가 발생했습니다: ' + error.message);
-      }
-    }
-  }, true);
 
   // 모달 닫기 버튼
   if (closeModal) {
@@ -322,15 +244,11 @@ async function initAdminPage() {
   if (hash && hash.startsWith('#post-')) {
     const postId = hash.replace('#post-', '');
     if (postId) {
-      // 페이지 로드 후 약간의 딜레이를 두고 모달 열기
       setTimeout(async () => {
         await openDetailModal(postId);
       }, 500);
     }
   }
-
-  console.log('=== initAdminPage 완료 ===');
-  console.log('모든 이벤트 리스너 등록 완료. 페이지 준비됨.');
 }
 
 // ==========================================
@@ -495,26 +413,13 @@ function escapeHtml(text) {
 // 글쓰기 모달 열기
 // ==========================================
 function openPostModal() {
-  console.log('openPostModal 함수 실행됨');
-
   const postModal = document.getElementById('postModal');
   const modalTitle = document.getElementById('modalTitle');
   const postForm = document.getElementById('postForm');
   const btnDelete = document.getElementById('btnDelete');
 
-  // 요소 확인
-  console.log('postModal:', postModal);
-  console.log('modalTitle:', modalTitle);
-  console.log('postForm:', postForm);
-
-  if (!postModal) {
-    console.error('postModal 요소를 찾을 수 없습니다!');
-    alert('모달을 표시할 수 없습니다. 페이지를 새로고침해주세요.');
-    return;
-  }
-
-  if (!modalTitle || !postForm) {
-    console.error('모달 내부 요소를 찾을 수 없습니다!');
+  if (!postModal || !modalTitle || !postForm) {
+    console.error('모달 요소를 찾을 수 없습니다');
     alert('모달을 표시할 수 없습니다. 페이지를 새로고침해주세요.');
     return;
   }
@@ -525,29 +430,19 @@ function openPostModal() {
   uploadedImageFiles = [];
   uploadedThumbnailFile = null;
 
-  // 썸네일 미리보기 초기화
+  // 미리보기 초기화
   const thumbnailPreview = document.getElementById('thumbnailPreview');
-  if (thumbnailPreview) {
-    thumbnailPreview.innerHTML = '';
-  }
-
-  // 이미지 미리보기 초기화
   const imagePreview = document.getElementById('imagePreview');
-  if (imagePreview) {
-    imagePreview.innerHTML = '';
-  }
+  if (thumbnailPreview) thumbnailPreview.innerHTML = '';
+  if (imagePreview) imagePreview.innerHTML = '';
 
-  // 삭제 버튼 숨기기 (새 글 작성 모드)
+  // 삭제 버튼 숨기기
   if (btnDelete) btnDelete.style.display = 'none';
 
-  // 1. 모달을 즉시 표시
-  console.log('모달 표시 시작 - display: flex 설정');
+  // 모달 표시 (애니메이션)
   postModal.style.display = 'flex';
-
-  // 2. 애니메이션을 위해 show 클래스 추가
   requestAnimationFrame(() => {
     postModal.classList.add('show');
-    console.log('모달 표시 완료 - show 클래스 추가됨');
   });
 }
 
@@ -936,23 +831,15 @@ async function handlePostSubmit() {
     return;
   }
 
-  console.log('=== 게시글 작성 시작 ===');
-  console.log('제목:', title);
-  console.log('내용 길이:', content.length);
-  console.log('썸네일 파일:', uploadedThumbnailFile);
-  console.log('상세 이미지 파일 수:', uploadedImageFiles.length);
-
   try {
     let imageUrls = [];
     let thumbnailUrl = null;
 
     // 썸네일 이미지 업로드
     if (uploadedThumbnailFile) {
-      console.log('썸네일 업로드 시작...');
       try {
         const thumbnailUrls = await uploadImages([uploadedThumbnailFile]);
         thumbnailUrl = thumbnailUrls[0];
-        console.log('썸네일 업로드 완료:', thumbnailUrl);
       } catch (err) {
         console.error('썸네일 업로드 실패:', err);
         alert('썸네일 이미지 업로드에 실패했습니다.');
@@ -960,12 +847,10 @@ async function handlePostSubmit() {
       }
     }
 
-    // 상세 이미지 업로드 (여러 개)
+    // 상세 이미지 업로드
     if (uploadedImageFiles && uploadedImageFiles.length > 0) {
-      console.log('상세 이미지 업로드 시작...');
       try {
         imageUrls = await uploadImages(uploadedImageFiles);
-        console.log('상세 이미지 업로드 완료:', imageUrls);
       } catch (err) {
         console.error('상세 이미지 업로드 실패:', err);
         alert('상세 이미지 업로드에 실패했습니다.');
@@ -1033,33 +918,17 @@ async function handlePostSubmit() {
         image_url: imageUrls.length > 0 ? JSON.stringify(imageUrls) : null
       };
 
-      console.log('DB 저장 시작:', postData);
-
       const { data, error } = await supabaseClient
         .from('posts')
         .insert([postData])
         .select();
 
       if (error) {
-        console.error('=== DB 저장 실패 ===');
-        console.error('Error object:', error);
-        console.error('Error code:', error.code);
-        console.error('Error message:', error.message);
-        console.error('Error hint:', error.hint);
-        console.error('Error details:', error.details);
-
-        // 에러 전체 정보 표시
-        let errorMsg = '게시글 작성에 실패했습니다.\n\n';
-        errorMsg += `에러 코드: ${error.code || 'N/A'}\n`;
-        errorMsg += `메시지: ${error.message || 'N/A'}\n`;
-        errorMsg += `힌트: ${error.hint || 'N/A'}\n`;
-        errorMsg += `상세: ${error.details || 'N/A'}`;
-
-        alert(errorMsg);
+        console.error('DB 저장 실패:', error);
+        alert(`게시글 작성에 실패했습니다.\n${error.message || error.hint || '알 수 없는 오류'}`);
         return;
       }
 
-      console.log('=== DB 저장 성공 ===', data);
       alert('게시글이 작성되었습니다.');
     }
 
@@ -1079,13 +948,8 @@ async function uploadImages(files) {
   const imageUrls = [];
   const filesArray = Array.isArray(files) ? files : Array.from(files);
 
-  console.log('=== 이미지 업로드 시작 ===');
-  console.log('업로드할 파일 수:', filesArray.length);
-
   // 현재 사용자 확인
   const { data: { user } } = await supabaseClient.auth.getUser();
-  console.log('현재 사용자:', user);
-
   if (!user) {
     alert('로그인이 필요합니다.');
     throw new Error('로그인이 필요합니다.');
@@ -1094,23 +958,14 @@ async function uploadImages(files) {
   for (let i = 0; i < filesArray.length; i++) {
     const file = filesArray[i];
 
-    // 파일 유효성 검사
     if (!file || !file.name) {
-      console.error(`파일 ${i + 1} 유효하지 않음`);
       throw new Error(`파일 ${i + 1}이 유효하지 않습니다.`);
     }
-
-    console.log(`\n[${i + 1}/${filesArray.length}] 업로드 시작`);
-    console.log('파일명:', file.name);
-    console.log('파일 크기:', (file.size / 1024).toFixed(2), 'KB');
-    console.log('파일 타입:', file.type);
 
     const fileExt = file.name.split('.').pop();
     const timestamp = Date.now();
     const random = Math.random().toString(36).substring(2, 8);
     const fileName = `${timestamp}_${random}.${fileExt}`;
-
-    console.log('저장 파일명:', fileName);
 
     // Storage에 업로드
     const { data: uploadData, error: uploadError } = await supabaseClient.storage
@@ -1122,31 +977,21 @@ async function uploadImages(files) {
       });
 
     if (uploadError) {
-      console.error('=== Storage 업로드 실패 ===');
-      console.error('Error code:', uploadError.statusCode);
-      console.error('Error message:', uploadError.message);
-      console.error('Error details:', uploadError);
-
+      console.error('Storage 업로드 실패:', uploadError.message);
       if (uploadError.statusCode === '403' || uploadError.message.includes('403')) {
-        alert('이미지 업로드 권한이 없습니다.\n\nSupabase Storage 정책을 확인해주세요:\n1. Supabase 대시보드 → Storage → post-images\n2. Policies 탭에서 INSERT 정책 확인');
+        alert('이미지 업로드 권한이 없습니다.\n\nSupabase Storage 정책을 확인해주세요.');
       }
-
       throw new Error(`${file.name} 업로드 실패: ${uploadError.message}`);
     }
-
-    console.log('Storage 업로드 성공:', uploadData);
 
     // 공개 URL 가져오기
     const { data: urlData } = supabaseClient.storage
       .from('post-images')
       .getPublicUrl(fileName);
 
-    console.log('공개 URL:', urlData.publicUrl);
     imageUrls.push(urlData.publicUrl);
   }
 
-  console.log('\n=== 모든 이미지 업로드 완료 ===');
-  console.log('업로드된 URL들:', imageUrls);
   return imageUrls;
 }
 
