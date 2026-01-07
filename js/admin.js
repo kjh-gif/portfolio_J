@@ -19,7 +19,7 @@ window.addEventListener('unhandledrejection', function(e) {
 });
 
 // 전역 변수
-let supabaseClient = null; // Supabase 클라이언트 (지연 초기화)
+// supabaseClient는 supabase-client.js에서 선언됨
 let currentEditingPostId = null;
 let uploadedImageFiles = []; // 최대 3개까지 (File 객체 배열)
 let uploadedThumbnailFile = null; // 썸네일 이미지

@@ -5,7 +5,7 @@
 console.log('>>> board.js 파일 로드 시작 <<<');
 
 // 전역 변수
-let supabaseClient = null; // Supabase 클라이언트 (지연 초기화)
+// supabaseClient는 supabase-client.js에서 선언됨
 let cachedPosts = []; // 로드된 게시글 캐시 (속도 개선용)
 
 // 페이지네이션 변수
