@@ -2,6 +2,22 @@
 // 관리자 페이지 JavaScript
 // ==========================================
 
+console.log('>>> admin.js 파일 로드 시작 <<<');
+
+// 전역 에러 핸들러 (디버깅용)
+window.addEventListener('error', function(e) {
+  console.error('❌❌❌ 전역 JavaScript 에러 발생 ❌❌❌');
+  console.error('에러 메시지:', e.message);
+  console.error('파일:', e.filename);
+  console.error('라인:', e.lineno, '컬럼:', e.colno);
+  console.error('에러 객체:', e.error);
+});
+
+window.addEventListener('unhandledrejection', function(e) {
+  console.error('❌❌❌ Promise 거부 발생 ❌❌❌');
+  console.error('거부 사유:', e.reason);
+});
+
 // 전역 변수
 let currentEditingPostId = null;
 let uploadedImageFiles = []; // 최대 3개까지 (File 객체 배열)
@@ -14,24 +30,69 @@ let currentPage = 1; // 현재 페이지
 let totalPages = 1; // 전체 페이지 수
 let allPosts = []; // 전체 게시글 (필터링 전)
 
-document.addEventListener('DOMContentLoaded', async function() {
+console.log('>>> 전역 변수 선언 완료 <<<');
+console.log('>>> DOMContentLoaded 이벤트 리스너 등록 시작 <<<');
 
-  // 관리자 권한 체크 (페이지 접근 제어)
-  const isLoggedIn = await checkAuth();
-  if (!isLoggedIn) {
-    alert('로그인이 필요합니다.');
-    window.location.href = 'login.html';
+// DOMContentLoaded가 이미 발생했을 수도 있으므로 체크
+if (document.readyState === 'loading') {
+  console.log('>>> 문서 로딩 중 - DOMContentLoaded 이벤트를 기다립니다 <<<');
+  document.addEventListener('DOMContentLoaded', initAdminPage);
+} else {
+  console.log('>>> 문서 이미 로드됨 - 즉시 초기화 시작 <<<');
+  initAdminPage();
+}
+
+async function initAdminPage() {
+  console.log('=== DOMContentLoaded 시작 ===');
+
+  // Supabase 클라이언트 확인
+  console.log('0. Supabase 클라이언트 확인...');
+  console.log('- window.supabase:', typeof window.supabase);
+  console.log('- supabaseClient:', typeof supabaseClient);
+
+  if (typeof window.supabase === 'undefined') {
+    console.error('❌ Supabase 라이브러리가 로드되지 않았습니다!');
+    alert('페이지 로딩에 실패했습니다. 새로고침 해주세요.');
     return;
   }
 
-  const user = await getCurrentUser();
-  if (!user) {
-    alert('로그인이 필요합니다.');
-    window.location.href = 'login.html';
+  if (typeof supabaseClient === 'undefined') {
+    console.error('❌ Supabase 클라이언트가 초기화되지 않았습니다!');
+    alert('페이지 초기화에 실패했습니다. 새로고침 해주세요.');
     return;
+  }
+
+  console.log('✓ Supabase 준비 완료');
+
+  try {
+    // 관리자 권한 체크 (페이지 접근 제어)
+    console.log('1. 로그인 상태 확인 중...');
+    const isLoggedIn = await checkAuth();
+    console.log('로그인 상태:', isLoggedIn);
+
+    if (!isLoggedIn) {
+      alert('로그인이 필요합니다.');
+      window.location.href = 'login.html';
+      return;
+    }
+
+    console.log('2. 사용자 정보 가져오는 중...');
+    const user = await getCurrentUser();
+    console.log('사용자:', user);
+
+    if (!user) {
+      alert('로그인이 필요합니다.');
+      window.location.href = 'login.html';
+      return;
+    }
+  } catch (error) {
+    console.error('인증 확인 중 에러 발생:', error);
+    alert('인증 확인 중 오류가 발생했습니다: ' + error.message);
+    // 에러가 발생해도 계속 진행 (이벤트 리스너는 등록되도록)
   }
 
   // UI 요소
+  console.log('3. UI 요소 가져오는 중...');
   const logoutBtn = document.getElementById('logoutBtn');
   const writeBtn = document.getElementById('writeBtn');
   const postModal = document.getElementById('postModal');
@@ -42,7 +103,14 @@ document.addEventListener('DOMContentLoaded', async function() {
   const searchBtn = document.getElementById('searchBtn');
   const searchInput = document.getElementById('searchInput');
 
+  console.log('UI 요소 확인:');
+  console.log('- logoutBtn:', logoutBtn);
+  console.log('- writeBtn:', writeBtn);
+  console.log('- postModal:', postModal);
+  console.log('- postForm:', postForm);
+
   // 로그아웃 버튼 이벤트
+  console.log('4. 로그아웃 버튼 이벤트 등록 중...');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', async function() {
       try {
@@ -62,17 +130,36 @@ document.addEventListener('DOMContentLoaded', async function() {
         alert('오류가 발생했습니다.');
       }
     });
+    console.log('✓ 로그아웃 버튼 이벤트 등록 완료');
   }
 
   // 게시글 목록 로드
-  await loadPosts();
+  console.log('5. 게시글 목록 로드 중...');
+  try {
+    await loadPosts();
+    console.log('✓ 게시글 목록 로드 완료');
+  } catch (error) {
+    console.error('게시글 로드 중 에러 발생:', error);
+    // 에러가 발생해도 계속 진행
+  }
 
   // 글쓰기 링크 클릭
+  console.log('6. Write 버튼 이벤트 등록 중...');
   if (writeBtn) {
+    console.log('Write 버튼 발견:', writeBtn);
     writeBtn.addEventListener('click', function(e) {
+      console.log('=== Write 버튼 클릭됨 ===');
       e.preventDefault();
-      openPostModal();
+      try {
+        openPostModal();
+      } catch (error) {
+        console.error('openPostModal 실행 중 에러:', error);
+        alert('모달을 여는 중 오류가 발생했습니다: ' + error.message);
+      }
     });
+    console.log('✓ Write 버튼 이벤트 등록 완료');
+  } else {
+    console.error('❌ writeBtn 요소를 찾을 수 없습니다!');
   }
 
   // 모달 닫기 버튼
@@ -214,7 +301,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
   }
 
-});
+  console.log('=== initAdminPage 완료 ===');
+  console.log('모든 이벤트 리스너 등록 완료. 페이지 준비됨.');
+}
 
 // ==========================================
 // 게시글 목록 조회
@@ -303,13 +392,16 @@ function displayPosts(posts) {
       thumbnailUrl = imageUrls.length > 0 ? imageUrls[0] : null;
     }
 
+    // 이미지 URL을 data 속성으로 저장 (프리로딩용)
+    const imageUrlsJson = post.image_url ? (typeof post.image_url === 'string' ? post.image_url : JSON.stringify(post.image_url)) : '';
+
     // 내용 미리보기 (30자로 제한)
     const contentPreview = post.content.length > 30
       ? post.content.substring(0, 30) + '...'
       : post.content;
 
     return `
-      <div class="post-card" data-id="${post.id}">
+      <div class="post-card" data-id="${post.id}" data-images="${escapeHtml(imageUrlsJson)}">
         ${thumbnailUrl ? `<img src="${thumbnailUrl}" alt="${escapeHtml(post.title)}">` : ''}
         <div class="post-card-content">
           <h3>${escapeHtml(post.title)}</h3>
@@ -324,7 +416,32 @@ function displayPosts(posts) {
   postCards.forEach(card => {
     card.addEventListener('click', async function() {
       const postId = this.getAttribute('data-id');
-      await handlePostCardClick(postId);
+      const imagesJson = this.getAttribute('data-images');
+
+      // 이미지 프리로드 시작 (모달 열기 전에)
+      let preloadedImages = [];
+      if (imagesJson) {
+        try {
+          let imageUrls = [];
+          try {
+            imageUrls = JSON.parse(imagesJson);
+          } catch {
+            imageUrls = [imagesJson];
+          }
+
+          if (Array.isArray(imageUrls)) {
+            preloadedImages = imageUrls.map(url => {
+              const img = new Image();
+              img.src = url;
+              return img;
+            });
+          }
+        } catch (e) {
+          console.error('Image preload error:', e);
+        }
+      }
+
+      await handlePostCardClick(postId, preloadedImages);
     });
   });
 }
@@ -350,10 +467,29 @@ function escapeHtml(text) {
 // 글쓰기 모달 열기
 // ==========================================
 function openPostModal() {
+  console.log('openPostModal 함수 실행됨');
+
   const postModal = document.getElementById('postModal');
   const modalTitle = document.getElementById('modalTitle');
   const postForm = document.getElementById('postForm');
   const btnDelete = document.getElementById('btnDelete');
+
+  // 요소 확인
+  console.log('postModal:', postModal);
+  console.log('modalTitle:', modalTitle);
+  console.log('postForm:', postForm);
+
+  if (!postModal) {
+    console.error('postModal 요소를 찾을 수 없습니다!');
+    alert('모달을 표시할 수 없습니다. 페이지를 새로고침해주세요.');
+    return;
+  }
+
+  if (!modalTitle || !postForm) {
+    console.error('모달 내부 요소를 찾을 수 없습니다!');
+    alert('모달을 표시할 수 없습니다. 페이지를 새로고침해주세요.');
+    return;
+  }
 
   modalTitle.textContent = '새 글 작성';
   postForm.reset();
@@ -363,16 +499,22 @@ function openPostModal() {
 
   // 썸네일 미리보기 초기화
   const thumbnailPreview = document.getElementById('thumbnailPreview');
-  thumbnailPreview.innerHTML = '';
+  if (thumbnailPreview) {
+    thumbnailPreview.innerHTML = '';
+  }
 
   // 이미지 미리보기 초기화
   const imagePreview = document.getElementById('imagePreview');
-  imagePreview.innerHTML = '';
+  if (imagePreview) {
+    imagePreview.innerHTML = '';
+  }
 
   // 삭제 버튼 숨기기 (새 글 작성 모드)
   if (btnDelete) btnDelete.style.display = 'none';
 
+  console.log('모달 표시 시작 - display: flex 설정');
   postModal.style.display = 'flex';
+  console.log('모달 표시 완료 - display:', postModal.style.display);
 }
 
 // ==========================================
