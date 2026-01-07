@@ -540,9 +540,15 @@ function openPostModal() {
   // 삭제 버튼 숨기기 (새 글 작성 모드)
   if (btnDelete) btnDelete.style.display = 'none';
 
+  // 1. 모달을 즉시 표시
   console.log('모달 표시 시작 - display: flex 설정');
   postModal.style.display = 'flex';
-  console.log('모달 표시 완료 - display:', postModal.style.display);
+
+  // 2. 애니메이션을 위해 show 클래스 추가
+  requestAnimationFrame(() => {
+    postModal.classList.add('show');
+    console.log('모달 표시 완료 - show 클래스 추가됨');
+  });
 }
 
 // ==========================================
@@ -550,7 +556,15 @@ function openPostModal() {
 // ==========================================
 function closePostModal() {
   const postModal = document.getElementById('postModal');
-  postModal.style.display = 'none';
+
+  // show 클래스 제거로 페이드 아웃
+  postModal.classList.remove('show');
+
+  // 애니메이션 완료 후 숨김
+  setTimeout(() => {
+    postModal.style.display = 'none';
+  }, 200);
+
   currentEditingPostId = null;
   uploadedImageFiles = [];
   uploadedThumbnailFile = null;
@@ -780,7 +794,13 @@ async function openEditModal(postId) {
     // 삭제 버튼 표시 (수정 모드)
     if (btnDelete) btnDelete.style.display = 'inline-block';
 
+    // 1. 모달을 즉시 표시
     postModal.style.display = 'flex';
+
+    // 2. 애니메이션을 위해 show 클래스 추가
+    requestAnimationFrame(() => {
+      postModal.classList.add('show');
+    });
 
   } catch (err) {
     console.error('Error:', err);
