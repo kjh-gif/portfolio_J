@@ -526,52 +526,77 @@ async function openDetailModal(postId) {
         imageUrls = post.image_url;
       }
 
+      // URL 필터링: 유효한 URL만 사용
+      imageUrls = imageUrls.filter(url => {
+        if (!url || typeof url !== 'string' || url.trim() === '') {
+          console.warn('잘못된 이미지 URL 제외:', url);
+          return false;
+        }
+        return true;
+      });
+
       // 로딩 상태 초기화
       detailImages.innerHTML = '';
 
-      // 각 이미지를 스켈레톤과 함께 즉시 추가 (프로그레시브 로딩)
-      imageUrls.forEach((url) => {
-        // 이미지 컨테이너 생성
-        const imgContainer = document.createElement('div');
-        imgContainer.style.cssText = 'position: relative; width: 100%; margin-bottom: 8px; background-color: #f0f0f0; border-radius: 8px; min-height: 400px;';
+      // 이미지가 없는 경우 안내 메시지
+      if (imageUrls.length === 0) {
+        detailImages.innerHTML = '<p style="text-align: center; padding: 40px; color: #999;">이미지가 없습니다.</p>';
+      } else {
+        // 각 이미지를 스켈레톤과 함께 즉시 추가 (프로그레시브 로딩)
+        imageUrls.forEach((url, index) => {
+          // 이미지 컨테이너 생성
+          const imgContainer = document.createElement('div');
+          imgContainer.style.cssText = 'position: relative; width: 100%; margin-bottom: 8px; background-color: #f0f0f0; border-radius: 8px; min-height: 400px;';
 
-        // 로딩 스피너
-        const loader = document.createElement('div');
-        loader.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #999; font-size: 14px;';
-        loader.textContent = '이미지 로딩 중...';
-        imgContainer.appendChild(loader);
+          // 로딩 스피너
+          const loader = document.createElement('div');
+          loader.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #999; font-size: 14px;';
+          loader.textContent = '이미지 로딩 중...';
+          imgContainer.appendChild(loader);
 
-        // 이미지 생성
-        const img = new Image();
-        img.style.cssText = 'width: 100%; border-radius: 8px; display: none; opacity: 0; transition: opacity 0.3s ease;';
-        img.alt = post.title;
+          // 이미지 생성
+          const img = new Image();
+          img.style.cssText = 'width: 100%; border-radius: 8px; display: none; opacity: 0; transition: opacity 0.3s ease;';
+          img.alt = post.title;
 
-        img.onload = () => {
-          // 로딩 완료 - 스피너 제거, 이미지 표시
-          loader.remove();
-          img.style.display = 'block';
-          imgContainer.style.minHeight = 'auto';
-          imgContainer.style.backgroundColor = 'transparent';
-          imgContainer.style.animation = 'none'; // 스켈레톤 애니메이션 중지
-          // 페이드 인 효과
-          setTimeout(() => {
-            img.style.opacity = '1';
-          }, 10);
-        };
+          img.onload = () => {
+            // 로딩 완료 - 스피너 제거, 이미지 표시
+            loader.remove();
+            img.style.display = 'block';
+            imgContainer.style.minHeight = 'auto';
+            imgContainer.style.backgroundColor = 'transparent';
+            imgContainer.style.animation = 'none';
+            // 페이드 인 효과
+            setTimeout(() => {
+              img.style.opacity = '1';
+            }, 10);
+          };
 
-        img.onerror = () => {
-          // 에러 시 스피너 제거, 에러 메시지 표시
-          loader.textContent = '이미지 로드 실패';
-          imgContainer.style.minHeight = '100px';
-          imgContainer.style.animation = 'none'; // 스켈레톤 애니메이션 중지
-        };
+          img.onerror = () => {
+            // 에러 시 스피너 제거, 에러 메시지 표시
+            console.error('이미지 로드 실패:', url);
+            console.error('게시글 ID:', post.id);
+            console.error('이미지 인덱스:', index);
+            loader.innerHTML = `
+              <div style="text-align: center;">
+                <p style="margin: 0 0 8px 0; color: #dc3545; font-weight: bold;">이미지 로드 실패</p>
+                <p style="margin: 0; font-size: 12px; color: #666; word-break: break-all; max-width: 300px;">${url}</p>
+              </div>
+            `;
+            imgContainer.style.minHeight = '150px';
+            imgContainer.style.animation = 'none';
+          };
 
-        imgContainer.appendChild(img);
-        detailImages.appendChild(imgContainer);
+          imgContainer.appendChild(img);
+          detailImages.appendChild(imgContainer);
 
-        // 이미지 로드 시작
-        img.src = url;
-      });
+          // 이미지 로드 시작
+          img.src = url;
+        });
+      }
+    } else {
+      // image_url 필드 자체가 없는 경우
+      detailImages.innerHTML = '<p style="text-align: center; padding: 40px; color: #999;">이미지가 없습니다.</p>';
     }
 
     // 내용 표시
