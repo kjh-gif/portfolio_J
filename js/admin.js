@@ -144,24 +144,51 @@ async function initAdminPage() {
     // 에러가 발생해도 계속 진행
   }
 
-  // 글쓰기 링크 클릭
+  // 글쓰기 링크 클릭 (이벤트 위임 방식)
   console.log('6. Write 버튼 이벤트 등록 중...');
+
+  // 방법 1: 직접 이벤트 등록
   if (writeBtn) {
     console.log('Write 버튼 발견:', writeBtn);
-    writeBtn.addEventListener('click', function(e) {
+    console.log('Write 버튼 tagName:', writeBtn.tagName);
+    console.log('Write 버튼 id:', writeBtn.id);
+    console.log('Write 버튼 className:', writeBtn.className);
+
+    // 기존 이벤트 리스너 제거 (혹시 중복 방지)
+    const newWriteBtn = writeBtn.cloneNode(true);
+    writeBtn.parentNode.replaceChild(newWriteBtn, writeBtn);
+
+    newWriteBtn.addEventListener('click', function(e) {
       console.log('=== Write 버튼 클릭됨 ===');
       e.preventDefault();
+      e.stopPropagation();
       try {
         openPostModal();
       } catch (error) {
         console.error('openPostModal 실행 중 에러:', error);
         alert('모달을 여는 중 오류가 발생했습니다: ' + error.message);
       }
-    });
+    }, true); // useCapture = true
+
     console.log('✓ Write 버튼 이벤트 등록 완료');
   } else {
     console.error('❌ writeBtn 요소를 찾을 수 없습니다!');
   }
+
+  // 방법 2: 이벤트 위임 (백업)
+  document.body.addEventListener('click', function(e) {
+    if (e.target && e.target.id === 'writeBtn') {
+      console.log('=== Write 버튼 클릭됨 (이벤트 위임) ===');
+      e.preventDefault();
+      e.stopPropagation();
+      try {
+        openPostModal();
+      } catch (error) {
+        console.error('openPostModal 실행 중 에러:', error);
+        alert('모달을 여는 중 오류가 발생했습니다: ' + error.message);
+      }
+    }
+  }, true);
 
   // 모달 닫기 버튼
   if (closeModal) {
