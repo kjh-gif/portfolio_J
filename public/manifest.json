@@ -1,0 +1,16 @@
+{
+  "name": "Portfolio - UI/UX Designer",
+  "short_name": "Portfolio",
+  "description": "UI/UX 디자이너 포트폴리오",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#EFE7E0",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

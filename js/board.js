@@ -123,7 +123,96 @@ async function initBoardPage() {
     }
   }
 
+  // Storage 상태 진단 실행 (성능: idle callback으로 연기)
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(() => {
+      diagnoseStorageStatus();
+    }, { timeout: 2000 });
+  } else {
+    setTimeout(() => {
+      diagnoseStorageStatus();
+    }, 1000);
+  }
+
   console.log('=== initBoardPage 완료 ===');
+}
+
+// ==========================================
+// Storage 상태 진단 도구
+// ==========================================
+async function diagnoseStorageStatus() {
+  console.log('');
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('📊 Supabase Storage 상태 진단');
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+  try {
+    // 1. Storage 버킷 목록 조회
+    const { data: buckets, error: bucketsError } = await supabaseClient.storage.listBuckets();
+
+    if (bucketsError) {
+      console.warn('⚠️  Storage 버킷 목록 조회 실패:', bucketsError.message);
+    } else {
+      console.log('✓ Storage 버킷 목록:');
+      buckets.forEach(bucket => {
+        console.log(`  - ${bucket.name} (Public: ${bucket.public ? 'Yes ✓' : 'No ✗'})`);
+      });
+
+      // post-images 버킷 확인
+      const postImagesBucket = buckets.find(b => b.name === 'post-images');
+      if (postImagesBucket) {
+        if (postImagesBucket.public) {
+          console.log('✓ post-images 버킷: Public 상태 (정상)');
+        } else {
+          console.warn('⚠️  post-images 버킷: Private 상태');
+          console.warn('   해결방법: Supabase Dashboard → Storage → post-images → Public bucket 활성화');
+        }
+      } else {
+        console.error('❌ post-images 버킷을 찾을 수 없습니다');
+      }
+    }
+
+    // 2. 테스트 URL 생성 및 확인
+    const testFileName = 'test-diagnostic.png';
+    const { data: testUrlData } = supabaseClient.storage
+      .from('post-images')
+      .getPublicUrl(testFileName);
+
+    console.log('');
+    console.log('✓ Public URL 생성 테스트:');
+    console.log('  테스트 URL:', testUrlData.publicUrl);
+
+    // 3. 실제 게시글의 이미지 URL 샘플 확인
+    if (cachedPosts && cachedPosts.length > 0) {
+      const postsWithImages = cachedPosts.filter(p => p.image_url);
+      if (postsWithImages.length > 0) {
+        console.log('');
+        console.log('✓ 게시글 이미지 URL 샘플:');
+        postsWithImages.slice(0, 2).forEach(post => {
+          let imageUrls = [];
+          if (typeof post.image_url === 'string') {
+            try {
+              imageUrls = JSON.parse(post.image_url);
+            } catch {
+              imageUrls = [post.image_url];
+            }
+          } else if (Array.isArray(post.image_url)) {
+            imageUrls = post.image_url;
+          }
+          console.log(`  게시글 "${post.title}":`);
+          imageUrls.forEach((url, idx) => {
+            console.log(`    [${idx}] ${url}`);
+          });
+        });
+      }
+    }
+
+  } catch (error) {
+    console.error('❌ Storage 진단 중 오류:', error.message);
+  }
+
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('');
 }
 
 // ==========================================
@@ -341,14 +430,26 @@ async function openDetailModal(postId, preloadedImages = []) {
         imageUrls = post.image_url;
       }
 
-      // URL 필터링: 유효한 URL만 사용
-      imageUrls = imageUrls.filter(url => {
-        if (!url || typeof url !== 'string' || url.trim() === '') {
-          console.warn('잘못된 이미지 URL 제외:', url);
-          return false;
-        }
-        return true;
-      });
+      // URL 필터링 및 정리: 유효한 URL만 사용
+      imageUrls = imageUrls
+        .map(url => {
+          // URL trim 및 기본 정리
+          if (!url || typeof url !== 'string') return null;
+          return url.trim();
+        })
+        .filter(url => {
+          if (!url || url === '') {
+            console.warn('❌ 잘못된 이미지 URL 제외:', url);
+            return false;
+          }
+          // URL 형식 기본 검증
+          if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            console.warn('❌ 유효하지 않은 URL 형식:', url);
+            return false;
+          }
+          console.log('✓ 유효한 이미지 URL:', url);
+          return true;
+        });
 
       // 로딩 상태 초기화
       detailImages.innerHTML = '';
@@ -357,6 +458,9 @@ async function openDetailModal(postId, preloadedImages = []) {
       if (imageUrls.length === 0) {
         detailImages.innerHTML = '<p style="text-align: center; padding: 40px; color: #999;">이미지가 없습니다.</p>';
       } else {
+        // 성능 최적화: DocumentFragment 사용 (layout thrashing 방지)
+        const fragment = document.createDocumentFragment();
+
         // 각 이미지를 스켈레톤과 함께 즉시 추가 (프로그레시브 로딩)
         imageUrls.forEach((url, index) => {
           // 이미지 컨테이너 생성
@@ -370,18 +474,18 @@ async function openDetailModal(postId, preloadedImages = []) {
           if (preloadedImg && (preloadedImg.complete || preloadedImg.naturalWidth > 0)) {
             // 이미 로드된 이미지 사용 (즉시 표시)
             img = preloadedImg;
-            img.style.cssText = 'width: 100%; border-radius: 8px; display: block; opacity: 0; transition: opacity 0.3s ease;';
+            img.style.cssText = 'width: 100%; height: auto; border-radius: 8px; display: block; opacity: 0; transition: opacity 0.3s ease;';
             img.alt = post.title;
 
             imgContainer.style.minHeight = 'auto';
             imgContainer.style.backgroundColor = 'transparent';
             imgContainer.appendChild(img);
-            detailImages.appendChild(imgContainer);
+            fragment.appendChild(imgContainer);
 
-            // 즉시 페이드 인
-            setTimeout(() => {
+            // 즉시 페이드 인 (requestAnimationFrame으로 연기)
+            requestAnimationFrame(() => {
               img.style.opacity = '1';
-            }, 10);
+            });
           } else {
             // 프리로드가 안 됐거나 로딩 중인 경우 - 스켈레톤 UI 표시
             const loader = document.createElement('div');
@@ -391,7 +495,7 @@ async function openDetailModal(postId, preloadedImages = []) {
 
             // 이미지 생성
             img = preloadedImg || new Image();
-            img.style.cssText = 'width: 100%; border-radius: 8px; display: none; opacity: 0; transition: opacity 0.3s ease;';
+            img.style.cssText = 'width: 100%; height: auto; border-radius: 8px; display: none; opacity: 0; transition: opacity 0.3s ease;';
             img.alt = post.title;
 
             img.onload = () => {
@@ -401,29 +505,58 @@ async function openDetailModal(postId, preloadedImages = []) {
               imgContainer.style.minHeight = 'auto';
               imgContainer.style.backgroundColor = 'transparent';
               imgContainer.style.animation = 'none';
-              // 페이드 인 효과
-              setTimeout(() => {
+              // 페이드 인 효과 (requestAnimationFrame으로 연기)
+              requestAnimationFrame(() => {
                 img.style.opacity = '1';
-              }, 10);
+              });
             };
 
-            img.onerror = () => {
-              // 에러 시 스피너 제거, 에러 메시지 표시
-              console.error('이미지 로드 실패:', url);
+            img.onerror = async () => {
+              // 에러 시 상세 진단
+              console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+              console.error('❌ 이미지 로드 실패 상세 정보');
+              console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
               console.error('게시글 ID:', post.id);
               console.error('이미지 인덱스:', index);
+              console.error('실패한 URL:', url);
+              console.error('URL 길이:', url.length);
+              console.error('URL 시작 문자:', url.substring(0, 50));
+              console.error('URL 끝 문자:', url.substring(url.length - 50));
+
+              // HTTP 상태 코드 확인 시도
+              try {
+                const response = await fetch(url, { method: 'HEAD' });
+                console.error('HTTP Status:', response.status);
+                console.error('Status Text:', response.statusText);
+
+                if (response.status === 404) {
+                  console.error('⚠️  원인: 파일이 Storage에 존재하지 않습니다 (404)');
+                } else if (response.status === 403) {
+                  console.error('⚠️  원인: 버킷이 Public이 아니거나 RLS 정책으로 차단됨 (403)');
+                  console.error('해결방법: Supabase Dashboard → Storage → post-images → Public bucket 활성화');
+                } else {
+                  console.error('⚠️  원인: 알 수 없는 오류 (' + response.status + ')');
+                }
+              } catch (fetchError) {
+                console.error('HTTP 상태 확인 실패:', fetchError.message);
+                console.error('⚠️  네트워크 오류 또는 CORS 문제일 수 있습니다');
+              }
+              console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+              // 사용자에게 표시할 에러 메시지
               loader.innerHTML = `
-                <div style="text-align: center;">
-                  <p style="margin: 0 0 8px 0; color: #dc3545; font-weight: bold;">이미지 로드 실패</p>
-                  <p style="margin: 0; font-size: 12px; color: #666; word-break: break-all; max-width: 300px;">${url}</p>
+                <div style="text-align: center; padding: 20px;">
+                  <p style="margin: 0 0 12px 0; color: #dc3545; font-weight: bold; font-size: 16px;">이미지 로드 실패</p>
+                  <p style="margin: 0 0 8px 0; font-size: 13px; color: #666;">개발자 도구(F12) 콘솔에서 상세 정보를 확인하세요</p>
+                  <p style="margin: 0; font-size: 11px; color: #999; word-break: break-all; max-width: 400px; background: #f5f5f5; padding: 8px; border-radius: 4px;">${url}</p>
                 </div>
               `;
-              imgContainer.style.minHeight = '150px';
+              imgContainer.style.minHeight = '180px';
               imgContainer.style.animation = 'none';
             };
 
             imgContainer.appendChild(img);
-            detailImages.appendChild(imgContainer);
+            fragment.appendChild(imgContainer);
 
             // 프리로드된 이미지가 없으면 로드 시작
             if (!preloadedImg) {
@@ -431,6 +564,9 @@ async function openDetailModal(postId, preloadedImages = []) {
             }
           }
         });
+
+        // 성능 최적화: 한 번에 DOM에 추가 (layout thrashing 방지)
+        detailImages.appendChild(fragment);
       }
     } else {
       // image_url 필드 자체가 없는 경우

@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "routes": [
+    {
+      "src": "/favicon.ico",
+      "dest": "/public/favicon.svg"
+    },
+    {
+      "src": "/manifest.json",
+      "dest": "/public/manifest.json"
+    }
+  ],
+  "cleanUrls": true,
+  "trailingSlash": false
+}

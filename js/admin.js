@@ -249,6 +249,86 @@ async function initAdminPage() {
       }, 500);
     }
   }
+
+  // Storage 상태 진단 실행
+  await diagnoseStorageStatus();
+}
+
+// ==========================================
+// Storage 상태 진단 도구
+// ==========================================
+async function diagnoseStorageStatus() {
+  console.log('');
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('📊 Supabase Storage 상태 진단 (관리자)');
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+  try {
+    // 1. Storage 버킷 목록 조회
+    const { data: buckets, error: bucketsError } = await supabaseClient.storage.listBuckets();
+
+    if (bucketsError) {
+      console.warn('⚠️  Storage 버킷 목록 조회 실패:', bucketsError.message);
+    } else {
+      console.log('✓ Storage 버킷 목록:');
+      buckets.forEach(bucket => {
+        console.log(`  - ${bucket.name} (Public: ${bucket.public ? 'Yes ✓' : 'No ✗'})`);
+      });
+
+      // post-images 버킷 확인
+      const postImagesBucket = buckets.find(b => b.name === 'post-images');
+      if (postImagesBucket) {
+        if (postImagesBucket.public) {
+          console.log('✓ post-images 버킷: Public 상태 (정상)');
+        } else {
+          console.warn('⚠️  post-images 버킷: Private 상태');
+          console.warn('   해결방법: Supabase Dashboard → Storage → post-images → Public bucket 활성화');
+        }
+      } else {
+        console.error('❌ post-images 버킷을 찾을 수 없습니다');
+      }
+    }
+
+    // 2. 관리자 권한 확인
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (user) {
+      console.log('');
+      console.log('✓ 관리자 인증 상태:');
+      console.log('  User ID:', user.id);
+      console.log('  Email:', user.email);
+    }
+
+    // 3. 실제 게시글의 이미지 URL 샘플 확인
+    if (cachedPosts && cachedPosts.length > 0) {
+      const postsWithImages = cachedPosts.filter(p => p.image_url);
+      if (postsWithImages.length > 0) {
+        console.log('');
+        console.log('✓ 게시글 이미지 URL 샘플:');
+        postsWithImages.slice(0, 2).forEach(post => {
+          let imageUrls = [];
+          if (typeof post.image_url === 'string') {
+            try {
+              imageUrls = JSON.parse(post.image_url);
+            } catch {
+              imageUrls = [post.image_url];
+            }
+          } else if (Array.isArray(post.image_url)) {
+            imageUrls = post.image_url;
+          }
+          console.log(`  게시글 "${post.title}":`);
+          imageUrls.forEach((url, idx) => {
+            console.log(`    [${idx}] ${url}`);
+          });
+        });
+      }
+    }
+
+  } catch (error) {
+    console.error('❌ Storage 진단 중 오류:', error.message);
+  }
+
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('');
 }
 
 // ==========================================
@@ -943,7 +1023,7 @@ async function handlePostSubmit() {
         image_url: imageUrls.length > 0 ? JSON.stringify(imageUrls) : null
       };
 
-      const { data, error } = await supabaseClient
+      const { error } = await supabaseClient
         .from('posts')
         .insert([postData])
         .select();
@@ -993,7 +1073,7 @@ async function uploadImages(files) {
     const fileName = `${timestamp}_${random}.${fileExt}`;
 
     // Storage에 업로드
-    const { data: uploadData, error: uploadError } = await supabaseClient.storage
+    const { error: uploadError } = await supabaseClient.storage
       .from('post-images')
       .upload(fileName, file, {
         cacheControl: '3600',
@@ -1014,9 +1094,22 @@ async function uploadImages(files) {
       .from('post-images')
       .getPublicUrl(fileName);
 
-    imageUrls.push(urlData.publicUrl);
+    // URL trim 및 유효성 검증
+    const publicUrl = urlData.publicUrl.trim();
+
+    // URL 검증
+    if (!publicUrl || !publicUrl.startsWith('http')) {
+      console.error('❌ 잘못된 Public URL:', publicUrl);
+      throw new Error(`유효하지 않은 URL이 생성되었습니다: ${publicUrl}`);
+    }
+
+    console.log('✓ 이미지 업로드 성공:', fileName);
+    console.log('  Public URL:', publicUrl);
+
+    imageUrls.push(publicUrl);
   }
 
+  console.log('✓ 총 ' + imageUrls.length + '개 이미지 업로드 완료');
   return imageUrls;
 }
 
