@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>이미지 Path 수정 스크립트</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <h1>이미지 Path 수정</h1>
+  <div id="status">실행 중...</div>
+  <div id="result"></div>
+
+  <script type="module">
+    // Supabase 설정 (환경 변수에서 가져오기)
+    const SUPABASE_URL = 'https://qbvjrycjbeztsoqwdvvg.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFidmpyeWNqYmV6dHNvcXdkdnZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU3OTY4MDUsImV4cCI6MjA1MTM3MjgwNX0.aXoGwjJHsqhwb5fKDRHgK8AEwgbNf7bSmQN-4EkDqlc';
+
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function fixImagePath() {
+      const statusDiv = document.getElementById('status');
+      const resultDiv = document.getElementById('result');
+
+      try {
+        // 1. 게시글 ID
+        const postId = 'c8533eed-b2fc-4a7f-8b08-34cf0ad68272';
+
+        // 2. 수정할 올바른 파일명
+        const correctFileName = '1767577013749_fn0jlm.png';
+
+        statusDiv.textContent = '게시글 조회 중...';
+
+        // 3. 현재 데이터 확인
+        const { data: post, error: fetchError } = await supabaseClient
+          .from('posts')
+          .select('*')
+          .eq('id', postId)
+          .single();
+
+        if (fetchError) {
+          throw new Error('게시글 조회 실패: ' + fetchError.message);
+        }
+
+        resultDiv.innerHTML += `<p><strong>현재 image_url:</strong> ${post.image_url}</p>`;
+
+        // 4. Storage에 파일 존재 확인
+        statusDiv.textContent = 'Storage 파일 확인 중...';
+
+        const { data: fileList, error: listError } = await supabaseClient.storage
+          .from('post-images')
+          .list('', { search: correctFileName });
+
+        if (listError || !fileList || fileList.length === 0) {
+          throw new Error(`Storage에 파일이 없습니다: ${correctFileName}`);
+        }
+
+        resultDiv.innerHTML += `<p style="color: green;">✓ Storage에 파일 존재 확인: ${correctFileName}</p>`;
+
+        // 5. DB 업데이트
+        statusDiv.textContent = 'DB 업데이트 중...';
+
+        const newImageUrl = JSON.stringify([correctFileName]);
+
+        const { error: updateError } = await supabaseClient
+          .from('posts')
+          .update({ image_url: newImageUrl })
+          .eq('id', postId);
+
+        if (updateError) {
+          throw new Error('DB 업데이트 실패: ' + updateError.message);
+        }
+
+        resultDiv.innerHTML += `<p style="color: green;">✓ DB 업데이트 완료</p>`;
+        resultDiv.innerHTML += `<p><strong>새 image_url:</strong> ${newImageUrl}</p>`;
+
+        // 6. 업데이트 확인
+        const { data: updatedPost, error: verifyError } = await supabaseClient
+          .from('posts')
+          .select('image_url')
+          .eq('id', postId)
+          .single();
+
+        if (verifyError) {
+          throw new Error('업데이트 확인 실패: ' + verifyError.message);
+        }
+
+        resultDiv.innerHTML += `<p><strong>확인된 image_url:</strong> ${updatedPost.image_url}</p>`;
+
+        statusDiv.textContent = '✓ 완료';
+        statusDiv.style.color = 'green';
+
+        resultDiv.innerHTML += `<hr><p style="color: blue; font-weight: bold;">이제 board.html에서 이미지가 정상 로드되는지 확인하세요.</p>`;
+
+      } catch (error) {
+        statusDiv.textContent = '❌ 오류 발생';
+        statusDiv.style.color = 'red';
+        resultDiv.innerHTML += `<p style="color: red;"><strong>Error:</strong> ${error.message}</p>`;
+        console.error('Error:', error);
+      }
+    }
+
+    // 페이지 로드 시 자동 실행
+    fixImagePath();
+  </script>
+</body>
+</html>

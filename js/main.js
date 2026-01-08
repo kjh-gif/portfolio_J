@@ -323,63 +323,111 @@ async function openDetailModal(postId) {
 
     // 이미지들 표시 (위에서 아래로) - 프로그레시브 로딩
     if (post.image_url) {
-      let imageUrls = [];
-      if (typeof post.image_url === 'string') {
-        try {
-          imageUrls = JSON.parse(post.image_url);
-        } catch {
-          imageUrls = [post.image_url];
-        }
-      } else if (Array.isArray(post.image_url)) {
-        imageUrls = post.image_url;
-      }
+      // ✅ 개선: path 배열로 정규화 (레거시 full URL도 호환)
+      const imagePaths = normalizeImagePaths(post.image_url);
+
+      console.log('📦 이미지 paths:', imagePaths);
+
+      // ✅ 개선: path를 public URL로 변환
+      const imageUrls = imagePaths
+        .map(path => getImagePublicUrl(path))
+        .filter(url => {
+          if (!url) {
+            console.warn('❌ Public URL 생성 실패');
+            return false;
+          }
+          console.log('✓ 이미지 URL 생성:', url);
+          return true;
+        });
 
       // 로딩 상태 초기화
       detailImages.innerHTML = '';
 
-      // 각 이미지를 스켈레톤과 함께 즉시 추가 (프로그레시브 로딩)
-      imageUrls.forEach((url, index) => {
-        // 이미지 컨테이너 생성
-        const imgContainer = document.createElement('div');
-        imgContainer.style.cssText = 'position: relative; width: 100%; margin-bottom: 8px; background-color: #f0f0f0; border-radius: 8px; min-height: 400px;';
+      // 이미지가 없는 경우 안내 메시지
+      if (imageUrls.length === 0) {
+        detailImages.innerHTML = '<p style="text-align: center; padding: 40px; color: #999;">이미지가 없습니다.</p>';
+      } else {
+        // 각 이미지를 스켈레톤과 함께 즉시 추가 (프로그레시브 로딩)
+        imageUrls.forEach((url, index) => {
+          // 이미지 컨테이너 생성
+          const imgContainer = document.createElement('div');
+          imgContainer.style.cssText = 'position: relative; width: 100%; margin-bottom: 8px; background-color: #f0f0f0; border-radius: 8px; min-height: 400px;';
 
-        // 로딩 스피너
-        const loader = document.createElement('div');
-        loader.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #999; font-size: 14px;';
-        loader.textContent = '이미지 로딩 중...';
-        imgContainer.appendChild(loader);
+          // 로딩 스피너
+          const loader = document.createElement('div');
+          loader.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #999; font-size: 14px;';
+          loader.textContent = '이미지 로딩 중...';
+          imgContainer.appendChild(loader);
 
-        // 이미지 생성
-        const img = new Image();
-        img.style.cssText = 'width: 100%; border-radius: 8px; display: none; opacity: 0; transition: opacity 0.3s ease;';
-        img.alt = post.title;
+          // 이미지 생성
+          const img = new Image();
+          img.style.cssText = 'width: 100%; border-radius: 8px; display: none; opacity: 0; transition: opacity 0.3s ease;';
+          img.alt = post.title;
 
-        img.onload = () => {
-          // 로딩 완료 - 스피너 제거, 이미지 표시
-          loader.remove();
-          img.style.display = 'block';
-          imgContainer.style.minHeight = 'auto';
-          imgContainer.style.backgroundColor = 'transparent';
-          imgContainer.style.animation = 'none'; // 스켈레톤 애니메이션 중지
-          // 페이드 인 효과
-          setTimeout(() => {
-            img.style.opacity = '1';
-          }, 10);
-        };
+          img.onload = () => {
+            // 로딩 완료 - 스피너 제거, 이미지 표시
+            loader.remove();
+            img.style.display = 'block';
+            imgContainer.style.minHeight = 'auto';
+            imgContainer.style.backgroundColor = 'transparent';
+            imgContainer.style.animation = 'none'; // 스켈레톤 애니메이션 중지
+            // 페이드 인 효과 (requestAnimationFrame 사용)
+            requestAnimationFrame(() => {
+              img.style.opacity = '1';
+            });
+          };
 
-        img.onerror = () => {
-          // 에러 시 스피너 제거, 에러 메시지 표시
-          loader.textContent = '이미지 로드 실패';
-          imgContainer.style.minHeight = '100px';
-          imgContainer.style.animation = 'none'; // 스켈레톤 애니메이션 중지
-        };
+          img.onerror = async () => {
+            // ✅ 개선: 에러 시 fallback 이미지 표시 (throw 금지)
+            console.warn('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.warn('⚠️  이미지 로드 실패 (main.js)');
+            console.warn('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.warn('게시글 ID:', post.id);
+            console.warn('이미지 인덱스:', index);
+            console.warn('실패한 URL:', url);
 
-        imgContainer.appendChild(img);
-        detailImages.appendChild(imgContainer);
+            // HTTP 상태 코드 확인 시도 (진단용)
+            try {
+              const response = await fetch(url, { method: 'HEAD' });
+              console.warn('HTTP Status:', response.status);
 
-        // 이미지 로드 시작
-        img.src = url;
-      });
+              if (response.status === 404) {
+                console.warn('⚠️  Storage에 파일이 존재하지 않습니다');
+                console.warn('해결방법: 게시글을 다시 작성하고 이미지를 재업로드하세요');
+              } else if (response.status === 403) {
+                console.warn('⚠️  버킷 권한 문제');
+                console.warn('해결방법: Supabase Dashboard → Storage → post-images → Public bucket 활성화');
+              }
+            } catch (fetchError) {
+              console.warn('네트워크 오류:', fetchError.message);
+            }
+            console.warn('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+            // ✅ 개선: Fallback UI 표시 (에러 throw 금지)
+            loader.innerHTML = `
+              <div style="text-align: center; padding: 20px;">
+                <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="80" height="80" rx="8" fill="#f0f0f0"/>
+                  <path d="M40 20L20 60H60L40 20Z" fill="#ccc"/>
+                  <circle cx="40" cy="50" r="3" fill="#999"/>
+                </svg>
+                <p style="margin: 12px 0 0 0; color: #999; font-size: 14px;">이미지를 불러올 수 없습니다</p>
+              </div>
+            `;
+            imgContainer.style.minHeight = '200px';
+            imgContainer.style.animation = 'none';
+          };
+
+          imgContainer.appendChild(img);
+          detailImages.appendChild(imgContainer);
+
+          // 이미지 로드 시작
+          img.src = url;
+        });
+      }
+    } else {
+      // image_url 필드 자체가 없는 경우
+      detailImages.innerHTML = '<p style="text-align: center; padding: 40px; color: #999;">이미지가 없습니다.</p>';
     }
 
     // 내용 표시
