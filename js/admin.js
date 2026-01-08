@@ -400,22 +400,20 @@ function displayPosts(posts) {
   }
 
   postGrid.innerHTML = posts.map(post => {
-    // 썸네일 또는 첫 번째 이미지 사용
-    let thumbnailUrl = post.thumbnail_url;
+    // ✅ 개선: 썸네일 또는 첫 번째 이미지 사용
+    let thumbnailUrl = null;
+
+    // 썸네일이 있으면 사용
+    if (post.thumbnail_url) {
+      thumbnailUrl = getImagePublicUrl(extractImagePath(post.thumbnail_url));
+    }
 
     // 썸네일이 없으면 첫 번째 상세 이미지 사용
     if (!thumbnailUrl && post.image_url) {
-      let imageUrls = [];
-      if (typeof post.image_url === 'string') {
-        try {
-          imageUrls = JSON.parse(post.image_url);
-        } catch {
-          imageUrls = [post.image_url];
-        }
-      } else if (Array.isArray(post.image_url)) {
-        imageUrls = post.image_url;
+      const imagePaths = normalizeImagePaths(post.image_url);
+      if (imagePaths.length > 0) {
+        thumbnailUrl = getImagePublicUrl(imagePaths[0]);
       }
-      thumbnailUrl = imageUrls.length > 0 ? imageUrls[0] : null;
     }
 
     // 이미지 URL을 data 속성으로 저장 (프리로딩용)
@@ -1089,24 +1087,23 @@ async function uploadImages(files) {
       throw new Error(`${file.name} 업로드 실패: ${uploadError.message}`);
     }
 
-    // 공개 URL 가져오기
-    const { data: urlData } = supabaseClient.storage
+    // ✅ 개선: Storage에 업로드 후 실제 파일 존재 확인
+    const { data: fileList, error: listError } = await supabaseClient.storage
       .from('post-images')
-      .getPublicUrl(fileName);
+      .list('', {
+        search: fileName
+      });
 
-    // URL trim 및 유효성 검증
-    const publicUrl = urlData.publicUrl.trim();
-
-    // URL 검증
-    if (!publicUrl || !publicUrl.startsWith('http')) {
-      console.error('❌ 잘못된 Public URL:', publicUrl);
-      throw new Error(`유효하지 않은 URL이 생성되었습니다: ${publicUrl}`);
+    if (listError || !fileList || fileList.length === 0) {
+      console.error('❌ 업로드 검증 실패: Storage에 파일이 없습니다:', fileName);
+      throw new Error(`업로드 검증 실패: ${fileName}`);
     }
 
     console.log('✓ 이미지 업로드 성공:', fileName);
-    console.log('  Public URL:', publicUrl);
+    console.log('  Storage path:', fileName);
 
-    imageUrls.push(publicUrl);
+    // ✅ 개선: DB에는 path만 저장 (full URL 저장 금지)
+    imageUrls.push(fileName);
   }
 
   console.log('✓ 총 ' + imageUrls.length + '개 이미지 업로드 완료');
@@ -1192,25 +1189,27 @@ async function deletePost(postId, imageUrlData) {
   if (!confirm('게시글을 삭제하시겠습니까?')) return;
 
   try {
-    // 이미지가 있으면 Storage에서 삭제
+    // ✅ 개선: 이미지가 있으면 Storage에서 삭제 (재발 방지)
     if (imageUrlData) {
-      let imageUrls = [];
-      if (typeof imageUrlData === 'string') {
-        try {
-          imageUrls = JSON.parse(imageUrlData);
-        } catch {
-          imageUrls = [imageUrlData];
-        }
-      } else if (Array.isArray(imageUrlData)) {
-        imageUrls = imageUrlData;
-      }
+      // path 배열로 정규화
+      const imagePaths = normalizeImagePaths(imageUrlData);
+
+      console.log('🗑️  삭제할 이미지 paths:', imagePaths);
 
       // 모든 이미지 삭제
-      for (const url of imageUrls) {
-        const imagePath = url.split('/').pop();
-        await supabaseClient.storage
+      for (const path of imagePaths) {
+        if (!path) continue;
+
+        const { error: removeError } = await supabaseClient.storage
           .from('post-images')
-          .remove([imagePath]);
+          .remove([path]);
+
+        if (removeError) {
+          console.warn('⚠️  이미지 삭제 실패:', path, removeError);
+          // 에러 발생해도 계속 진행 (다른 이미지들도 삭제)
+        } else {
+          console.log('✓ 이미지 삭제 성공:', path);
+        }
       }
     }
 

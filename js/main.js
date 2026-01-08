@@ -230,22 +230,20 @@ function displayWorkPosts(posts) {
   }
 
   workGrid.innerHTML = posts.map(post => {
-    // 썸네일 또는 첫 번째 이미지 사용
-    let thumbnailUrl = post.thumbnail_url;
+    // ✅ 개선: 썸네일 또는 첫 번째 이미지 사용
+    let thumbnailUrl = null;
+
+    // 썸네일이 있으면 사용
+    if (post.thumbnail_url) {
+      thumbnailUrl = getImagePublicUrl(extractImagePath(post.thumbnail_url));
+    }
 
     // 썸네일이 없으면 첫 번째 상세 이미지 사용
     if (!thumbnailUrl && post.image_url) {
-      let imageUrls = [];
-      if (typeof post.image_url === 'string') {
-        try {
-          imageUrls = JSON.parse(post.image_url);
-        } catch {
-          imageUrls = [post.image_url];
-        }
-      } else if (Array.isArray(post.image_url)) {
-        imageUrls = post.image_url;
+      const imagePaths = normalizeImagePaths(post.image_url);
+      if (imagePaths.length > 0) {
+        thumbnailUrl = getImagePublicUrl(imagePaths[0]);
       }
-      thumbnailUrl = imageUrls.length > 0 ? imageUrls[0] : null;
     }
 
     // 내용 전체 표시

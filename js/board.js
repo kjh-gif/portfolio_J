@@ -284,22 +284,20 @@ function displayPosts(posts) {
   }
 
   postGrid.innerHTML = posts.map(post => {
-    // 썸네일 또는 첫 번째 이미지 사용
-    let thumbnailUrl = post.thumbnail_url;
+    // ✅ 개선: 썸네일 또는 첫 번째 이미지 사용
+    let thumbnailUrl = null;
+
+    // 썸네일이 있으면 사용
+    if (post.thumbnail_url) {
+      thumbnailUrl = getImagePublicUrl(extractImagePath(post.thumbnail_url));
+    }
 
     // 썸네일이 없으면 첫 번째 상세 이미지 사용
     if (!thumbnailUrl && post.image_url) {
-      let imageUrls = [];
-      if (typeof post.image_url === 'string') {
-        try {
-          imageUrls = JSON.parse(post.image_url);
-        } catch {
-          imageUrls = [post.image_url];
-        }
-      } else if (Array.isArray(post.image_url)) {
-        imageUrls = post.image_url;
+      const imagePaths = normalizeImagePaths(post.image_url);
+      if (imagePaths.length > 0) {
+        thumbnailUrl = getImagePublicUrl(imagePaths[0]);
       }
-      thumbnailUrl = imageUrls.length > 0 ? imageUrls[0] : null;
     }
 
     // 이미지 URL을 data 속성으로 저장 (프리로딩용)
@@ -419,35 +417,20 @@ async function openDetailModal(postId, preloadedImages = []) {
 
     // 이미지들 표시 (위에서 아래로) - 프로그레시브 로딩
     if (post.image_url) {
-      let imageUrls = [];
-      if (typeof post.image_url === 'string') {
-        try {
-          imageUrls = JSON.parse(post.image_url);
-        } catch {
-          imageUrls = [post.image_url];
-        }
-      } else if (Array.isArray(post.image_url)) {
-        imageUrls = post.image_url;
-      }
+      // ✅ 개선: path 배열로 정규화 (레거시 full URL도 호환)
+      const imagePaths = normalizeImagePaths(post.image_url);
 
-      // URL 필터링 및 정리: 유효한 URL만 사용
-      imageUrls = imageUrls
-        .map(url => {
-          // URL trim 및 기본 정리
-          if (!url || typeof url !== 'string') return null;
-          return url.trim();
-        })
+      console.log('📦 이미지 paths:', imagePaths);
+
+      // ✅ 개선: path를 public URL로 변환
+      const imageUrls = imagePaths
+        .map(path => getImagePublicUrl(path))
         .filter(url => {
-          if (!url || url === '') {
-            console.warn('❌ 잘못된 이미지 URL 제외:', url);
+          if (!url) {
+            console.warn('❌ Public URL 생성 실패');
             return false;
           }
-          // URL 형식 기본 검증
-          if (!url.startsWith('http://') && !url.startsWith('https://')) {
-            console.warn('❌ 유효하지 않은 URL 형식:', url);
-            return false;
-          }
-          console.log('✓ 유효한 이미지 URL:', url);
+          console.log('✓ 이미지 URL 생성:', url);
           return true;
         });
 
@@ -512,46 +495,43 @@ async function openDetailModal(postId, preloadedImages = []) {
             };
 
             img.onerror = async () => {
-              // 에러 시 상세 진단
-              console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-              console.error('❌ 이미지 로드 실패 상세 정보');
-              console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-              console.error('게시글 ID:', post.id);
-              console.error('이미지 인덱스:', index);
-              console.error('실패한 URL:', url);
-              console.error('URL 길이:', url.length);
-              console.error('URL 시작 문자:', url.substring(0, 50));
-              console.error('URL 끝 문자:', url.substring(url.length - 50));
+              // ✅ 개선: 에러 시 fallback 이미지 표시 (throw 금지)
+              console.warn('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+              console.warn('⚠️  이미지 로드 실패');
+              console.warn('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+              console.warn('게시글 ID:', post.id);
+              console.warn('이미지 인덱스:', index);
+              console.warn('실패한 URL:', url);
 
-              // HTTP 상태 코드 확인 시도
+              // HTTP 상태 코드 확인 시도 (진단용)
               try {
                 const response = await fetch(url, { method: 'HEAD' });
-                console.error('HTTP Status:', response.status);
-                console.error('Status Text:', response.statusText);
+                console.warn('HTTP Status:', response.status);
 
                 if (response.status === 404) {
-                  console.error('⚠️  원인: 파일이 Storage에 존재하지 않습니다 (404)');
+                  console.warn('⚠️  Storage에 파일이 존재하지 않습니다');
+                  console.warn('해결방법: 게시글을 다시 작성하고 이미지를 재업로드하세요');
                 } else if (response.status === 403) {
-                  console.error('⚠️  원인: 버킷이 Public이 아니거나 RLS 정책으로 차단됨 (403)');
-                  console.error('해결방법: Supabase Dashboard → Storage → post-images → Public bucket 활성화');
-                } else {
-                  console.error('⚠️  원인: 알 수 없는 오류 (' + response.status + ')');
+                  console.warn('⚠️  버킷 권한 문제');
+                  console.warn('해결방법: Supabase Dashboard → Storage → post-images → Public bucket 활성화');
                 }
               } catch (fetchError) {
-                console.error('HTTP 상태 확인 실패:', fetchError.message);
-                console.error('⚠️  네트워크 오류 또는 CORS 문제일 수 있습니다');
+                console.warn('네트워크 오류:', fetchError.message);
               }
-              console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+              console.warn('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
-              // 사용자에게 표시할 에러 메시지
+              // ✅ 개선: Fallback UI 표시 (에러 throw 금지)
               loader.innerHTML = `
                 <div style="text-align: center; padding: 20px;">
-                  <p style="margin: 0 0 12px 0; color: #dc3545; font-weight: bold; font-size: 16px;">이미지 로드 실패</p>
-                  <p style="margin: 0 0 8px 0; font-size: 13px; color: #666;">개발자 도구(F12) 콘솔에서 상세 정보를 확인하세요</p>
-                  <p style="margin: 0; font-size: 11px; color: #999; word-break: break-all; max-width: 400px; background: #f5f5f5; padding: 8px; border-radius: 4px;">${url}</p>
+                  <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="80" height="80" rx="8" fill="#f0f0f0"/>
+                    <path d="M40 20L20 60H60L40 20Z" fill="#ccc"/>
+                    <circle cx="40" cy="50" r="3" fill="#999"/>
+                  </svg>
+                  <p style="margin: 12px 0 0 0; color: #999; font-size: 14px;">이미지를 불러올 수 없습니다</p>
                 </div>
               `;
-              imgContainer.style.minHeight = '180px';
+              imgContainer.style.minHeight = '200px';
               imgContainer.style.animation = 'none';
             };
 
