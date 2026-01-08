@@ -938,26 +938,35 @@ async function handlePostSubmit() {
     let imageUrls = [];
     let thumbnailUrl = null;
 
-    // 썸네일 이미지 업로드
+    // ✅ 핵심: 썸네일 이미지 업로드 (실패 시 DB 저장 차단)
     if (uploadedThumbnailFile) {
       try {
-        const thumbnailUrls = await uploadImages([uploadedThumbnailFile]);
-        thumbnailUrl = thumbnailUrls[0];
+        const thumbnailPaths = await uploadImages([uploadedThumbnailFile]);
+        if (thumbnailPaths.length > 0) {
+          thumbnailUrl = thumbnailPaths[0]; // path만 저장
+          console.log('✓ 썸네일 업로드 성공:', thumbnailUrl);
+        } else {
+          throw new Error('썸네일 path가 없습니다');
+        }
       } catch (err) {
-        console.error('썸네일 업로드 실패:', err);
-        alert('썸네일 이미지 업로드에 실패했습니다.');
-        return;
+        console.error('❌ 썸네일 업로드 실패:', err);
+        alert('썸네일 이미지 업로드에 실패했습니다.\n\n' + err.message);
+        return; // DB 저장 차단
       }
     }
 
-    // 상세 이미지 업로드
+    // ✅ 핵심: 상세 이미지 업로드 (실패 시 DB 저장 차단)
     if (uploadedImageFiles && uploadedImageFiles.length > 0) {
       try {
         imageUrls = await uploadImages(uploadedImageFiles);
+        if (imageUrls.length === 0) {
+          throw new Error('이미지 path가 없습니다');
+        }
+        console.log('✓ 상세 이미지 업로드 성공:', imageUrls);
       } catch (err) {
-        console.error('상세 이미지 업로드 실패:', err);
-        alert('상세 이미지 업로드에 실패했습니다.');
-        return;
+        console.error('❌ 상세 이미지 업로드 실패:', err);
+        alert('상세 이미지 업로드에 실패했습니다.\n\n' + err.message);
+        return; // DB 저장 차단
       }
     }
 
@@ -970,32 +979,34 @@ async function handlePostSubmit() {
         updateData.thumbnail_url = thumbnailUrl;
       }
 
-      // 새 이미지가 있으면 추가 (기존 이미지 유지하면서)
+      // ✅ 개선: 새 이미지가 있으면 추가 (기존 이미지 유지하면서)
       if (imageUrls.length > 0) {
-        // 기존 이미지 URL 가져오기
+        // 기존 이미지 path 가져오기
         const { data: existingPost } = await supabaseClient
           .from('posts')
           .select('image_url')
           .eq('id', currentEditingPostId)
           .single();
 
-        let existingUrls = [];
-        if (existingPost && existingPost.image_url) {
-          // 기존 데이터가 배열인지 문자열인지 확인
-          if (typeof existingPost.image_url === 'string') {
-            try {
-              existingUrls = JSON.parse(existingPost.image_url);
-            } catch {
-              existingUrls = [existingPost.image_url];
-            }
-          } else if (Array.isArray(existingPost.image_url)) {
-            existingUrls = existingPost.image_url;
+        // ✅ 기존 paths를 정규화 (full URL → path)
+        const existingPaths = normalizeImagePaths(existingPost?.image_url);
+
+        // ✅ 기존 + 새 이미지 (최대 3개)
+        const allPaths = [...existingPaths, ...imageUrls].slice(0, 3);
+
+        // ✅ 핵심: 최대 3개 초과 시 오래된 이미지 Storage에서 삭제
+        if (existingPaths.length + imageUrls.length > 3) {
+          const removedPaths = [...existingPaths, ...imageUrls].slice(3);
+          console.log('🗑️  최대 개수 초과로 이미지 삭제:', removedPaths);
+
+          for (const path of removedPaths) {
+            await supabaseClient.storage
+              .from('post-images')
+              .remove([path]);
           }
         }
 
-        // 기존 + 새 이미지 (최대 3개)
-        const allUrls = [...existingUrls, ...imageUrls].slice(0, 3);
-        updateData.image_url = JSON.stringify(allUrls);
+        updateData.image_url = JSON.stringify(allPaths);
       }
 
       const { error } = await supabaseClient
@@ -1117,7 +1128,7 @@ async function deleteSingleImage(postId, imageIndex) {
   if (!confirm('이미지를 삭제하시겠습니까?')) return;
 
   try {
-    // 현재 게시글의 이미지 URL 가져오기
+    // 현재 게시글의 이미지 path 가져오기
     const { data: post, error: fetchError } = await supabaseClient
       .from('posts')
       .select('image_url')
@@ -1130,40 +1141,35 @@ async function deleteSingleImage(postId, imageIndex) {
       return;
     }
 
-    // 이미지 URL 배열 파싱
-    let imageUrls = [];
-    if (post.image_url) {
-      if (typeof post.image_url === 'string') {
-        try {
-          imageUrls = JSON.parse(post.image_url);
-        } catch {
-          imageUrls = [post.image_url];
-        }
-      } else if (Array.isArray(post.image_url)) {
-        imageUrls = post.image_url;
-      }
-    }
+    // ✅ 개선: path 배열로 정규화
+    const imagePaths = normalizeImagePaths(post.image_url);
 
-    if (imageIndex < 0 || imageIndex >= imageUrls.length) {
+    if (imageIndex < 0 || imageIndex >= imagePaths.length) {
       alert('잘못된 이미지 인덱스입니다.');
       return;
     }
 
-    // Storage에서 해당 이미지 삭제
-    const imageUrl = imageUrls[imageIndex];
-    const imagePath = imageUrl.split('/').pop();
-    await supabaseClient.storage
+    // ✅ Storage에서 해당 이미지 삭제 (path 직접 사용)
+    const imagePath = imagePaths[imageIndex];
+    const { error: removeError } = await supabaseClient.storage
       .from('post-images')
       .remove([imagePath]);
 
+    if (removeError) {
+      console.warn('⚠️  Storage 삭제 실패:', removeError);
+      // Storage 삭제 실패해도 DB에서는 제거 (고아 파일 방지)
+    } else {
+      console.log('✓ Storage 이미지 삭제:', imagePath);
+    }
+
     // 배열에서 해당 이미지 제거
-    imageUrls.splice(imageIndex, 1);
+    imagePaths.splice(imageIndex, 1);
 
     // DB 업데이트
     const { error } = await supabaseClient
       .from('posts')
       .update({
-        image_url: imageUrls.length > 0 ? JSON.stringify(imageUrls) : null
+        image_url: imagePaths.length > 0 ? JSON.stringify(imagePaths) : null
       })
       .eq('id', postId);
 

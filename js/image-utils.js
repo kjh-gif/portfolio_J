@@ -93,3 +93,85 @@ function normalizeImagePaths(imageData) {
     .map(item => extractImagePath(item))
     .filter(path => path && path !== '');
 }
+
+/**
+ * Storage에 파일이 실제로 존재하는지 확인
+ * @param {string} path - Storage path
+ * @returns {Promise<boolean>} 파일 존재 여부
+ */
+async function checkImageExists(path) {
+  if (!path || typeof path !== 'string') {
+    return false;
+  }
+
+  try {
+    // Storage에서 파일 목록 조회
+    const { data, error } = await supabaseClient.storage
+      .from('post-images')
+      .list('', {
+        search: path
+      });
+
+    if (error || !data || data.length === 0) {
+      console.warn('⚠️  Storage에 파일 없음:', path);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('❌ checkImageExists 에러:', error);
+    return false;
+  }
+}
+
+/**
+ * 이미지 path 배열 검증 및 정리 (존재하지 않는 파일 제거)
+ * @param {Array} paths - path 배열
+ * @returns {Promise<Array>} 검증된 path 배열
+ */
+async function validateAndCleanImagePaths(paths) {
+  if (!paths || paths.length === 0) {
+    return [];
+  }
+
+  const validPaths = [];
+
+  for (const path of paths) {
+    const exists = await checkImageExists(path);
+    if (exists) {
+      validPaths.push(path);
+    } else {
+      console.warn('🗑️  존재하지 않는 이미지 제거:', path);
+    }
+  }
+
+  return validPaths;
+}
+
+/**
+ * 게시글의 깨진 이미지 자동 정리 (DB 업데이트)
+ * @param {string} postId - 게시글 ID
+ * @param {Array} validPaths - 검증된 path 배열
+ */
+async function cleanBrokenImages(postId, validPaths) {
+  if (!postId) return;
+
+  try {
+    const updateData = {
+      image_url: validPaths.length > 0 ? JSON.stringify(validPaths) : null
+    };
+
+    const { error } = await supabaseClient
+      .from('posts')
+      .update(updateData)
+      .eq('id', postId);
+
+    if (error) {
+      console.error('❌ DB 업데이트 실패:', error);
+    } else {
+      console.log('✓ 깨진 이미지 자동 정리 완료:', postId);
+    }
+  } catch (error) {
+    console.error('❌ cleanBrokenImages 에러:', error);
+  }
+}

@@ -418,9 +418,21 @@ async function openDetailModal(postId, preloadedImages = []) {
     // 이미지들 표시 (위에서 아래로) - 프로그레시브 로딩
     if (post.image_url) {
       // ✅ 개선: path 배열로 정규화 (레거시 full URL도 호환)
-      const imagePaths = normalizeImagePaths(post.image_url);
+      let imagePaths = normalizeImagePaths(post.image_url);
 
-      console.log('📦 이미지 paths:', imagePaths);
+      console.log('📦 원본 이미지 paths:', imagePaths);
+
+      // ✅ 핵심: Storage 파일 존재 여부 검증 및 자동 정리
+      const validPaths = await validateAndCleanImagePaths(imagePaths);
+
+      if (validPaths.length !== imagePaths.length) {
+        console.warn(`⚠️  ${imagePaths.length - validPaths.length}개 이미지가 Storage에 없어 제거됨`);
+        // DB 자동 업데이트 (깨진 이미지 제거)
+        await cleanBrokenImages(post.id, validPaths);
+        imagePaths = validPaths;
+      }
+
+      console.log('📦 검증된 이미지 paths:', imagePaths);
 
       // ✅ 개선: path를 public URL로 변환
       const imageUrls = imagePaths
