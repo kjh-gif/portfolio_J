@@ -259,7 +259,6 @@ section {
   cursor: pointer;
   width: 100%;
   height: auto;
-  aspect-ratio: 1 / 1;
   display: flex;
   flex-direction: column;
 }
@@ -271,7 +270,7 @@ section {
 
 .work-card img {
   width: 100%;
-  height: 70%;
+  height: 280px;
   object-fit: contain;
   flex-shrink: 0;
   background-color: #f9f9f9;
@@ -299,10 +298,6 @@ section {
   font-size: 16px;
   color: var(--color-text-light);
   line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
 /* CTA 버튼 - Editorial Style */
@@ -818,7 +813,6 @@ footer p {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   width: 100%;
   height: auto;
-  aspect-ratio: 1 / 1;
   display: flex;
   flex-direction: column;
 }
@@ -830,7 +824,7 @@ footer p {
 
 .post-card img {
   width: 100%;
-  height: 70%;
+  height: 280px;
   object-fit: contain;
   flex-shrink: 0;
   background-color: #f9f9f9;
@@ -858,10 +852,6 @@ footer p {
   font-size: 16px;
   color: var(--color-text-light);
   line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
 /* 모달 */
