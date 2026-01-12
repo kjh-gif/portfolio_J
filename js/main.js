@@ -33,6 +33,22 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
   });
 
+  // URL 해시가 있으면 해당 섹션으로 스크롤 (외부 페이지에서 이동 시)
+  const hash = window.location.hash;
+  if (hash) {
+    setTimeout(() => {
+      const targetElement = document.querySelector(hash);
+      if (targetElement) {
+        const headerHeight = 80;
+        const targetPosition = targetElement.offsetTop - headerHeight;
+        window.scrollTo({
+          top: targetPosition,
+          behavior: 'smooth'
+        });
+      }
+    }, 100); // 페이지 로드 후 약간의 딜레이
+  }
+
 });
 
 // ==========================================
