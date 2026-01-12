@@ -293,7 +293,7 @@ async function openDetailModal(postId) {
     // 4. 데이터로 내용 채우기
     detailTitle.textContent = post.title;
 
-    // 이미지들 표시 (위에서 아래로)
+    // 이미지들 표시 (위에서 아래로) - 프리로드 방식으로 개선
     if (post.image_url) {
       let imageUrls = [];
       if (typeof post.image_url === 'string') {
@@ -306,14 +306,24 @@ async function openDetailModal(postId) {
         imageUrls = post.image_url;
       }
 
-      imageUrls.forEach(url => {
-        const img = document.createElement('img');
-        img.src = url;
-        img.alt = post.title;
-        img.style.width = '100%';
-        img.style.marginBottom = '8px';
-        img.style.borderRadius = '8px';
-        detailImages.appendChild(img);
+      // 이미지 프리로드 (모든 이미지를 먼저 로드)
+      const loadPromises = imageUrls.map(url => {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = () => resolve(null); // 에러 시에도 계속 진행
+          img.src = url;
+          img.alt = post.title;
+          img.style.width = '100%';
+          img.style.marginBottom = '8px';
+          img.style.borderRadius = '8px';
+        });
+      });
+
+      // 모든 이미지 로드 완료 후 한꺼번에 표시
+      const loadedImages = await Promise.all(loadPromises);
+      loadedImages.forEach(img => {
+        if (img) detailImages.appendChild(img);
       });
     }
 
