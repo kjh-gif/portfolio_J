@@ -172,14 +172,11 @@ section {
   margin: 0 auto;
 }
 
-/* Hero 섹션 */
+/* Hero 섹션 - Editorial Minimal Style */
 .hero-section {
-  min-height: 400px;
+  min-height: 280px;
   width: 100%;
-  background-image: url('../img/hero-bg.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background: linear-gradient(135deg, #F7F2EF 0%, #DCD9CD 100%);
   position: relative;
   display: flex;
   justify-content: center;
@@ -190,20 +187,13 @@ section {
 }
 
 .hero-section::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(220, 217, 205, 0.3);
-  z-index: 1;
+  display: none;
 }
 
 .hero-content {
   max-width: var(--max-width);
   width: 100%;
-  padding: var(--spacing-xl) var(--spacing-md);
+  padding: 60px var(--spacing-md);
   position: relative;
   z-index: 2;
   display: flex;
@@ -212,82 +202,83 @@ section {
 }
 
 .hero-section h1 {
-  font-size: 52px;
+  font-size: 56px;
   font-weight: var(--font-weight-bold);
   color: var(--color-point);
-  margin-bottom: var(--spacing-md);
-  line-height: 1.2;
+  margin-bottom: 20px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
 }
 
 .hero-section p {
-  font-size: 20px;
+  font-size: 18px;
   color: var(--color-text);
-  margin-bottom: var(--spacing-lg);
-  line-height: 1.6;
+  margin-bottom: 0;
+  line-height: 1.7;
+  font-weight: 400;
 }
 
 .hero-section .cta-button {
-  padding: 14px 36px;
-  background-color: var(--color-point);
-  color: #ffffff;
-  font-size: 16px;
-  font-weight: var(--font-weight-bold);
-  border-radius: 8px;
-  transition: all 0.3s ease;
+  display: none;
 }
 
-.hero-section .cta-button:hover {
-  background-color: #2a2a2a;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-/* Work 섹션 */
+/* Work 섹션 - Editorial 2-Column Layout */
 .work-section {
   background-color: #ffffff;
+  padding: 80px var(--spacing-md);
 }
 
 .work-section h2 {
-  font-size: 44px;
+  font-size: 40px;
   font-weight: var(--font-weight-bold);
   color: var(--color-point);
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: 16px;
+  letter-spacing: -0.01em;
+}
+
+.work-section > p {
+  font-size: 16px;
+  color: var(--color-text-light);
+  margin-bottom: 60px;
+  font-weight: 400;
 }
 
 .work-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 40px;
-  margin-top: var(--spacing-lg);
+  grid-template-columns: repeat(2, 1fr);
+  gap: 48px;
+  margin-top: 0;
+  max-width: var(--max-width);
+  margin: 0 auto;
 }
 
 .work-card {
   background-color: var(--color-sub-main-2);
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   width: 100%;
   height: auto;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 4 / 3;
   display: flex;
   flex-direction: column;
 }
 
 .work-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
 }
 
 .work-card img {
   width: 100%;
-  height: 70%;
+  height: 65%;
   object-fit: cover;
   flex-shrink: 0;
 }
 
 .work-card-content {
-  padding: 20px;
+  padding: 28px;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -298,44 +289,67 @@ section {
   font-size: 20px;
   font-weight: var(--font-weight-bold);
   color: var(--color-point);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  letter-spacing: -0.01em;
 }
 
 .work-card p {
-  font-size: 16px;
+  font-size: 15px;
   color: var(--color-text-light);
-  line-height: 1.5;
+  line-height: 1.6;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-/* Contact 섹션 */
+/* CTA 버튼 - Editorial Style */
+.cta-button {
+  display: inline-block;
+  padding: 16px 40px;
+  background-color: transparent;
+  color: var(--color-point);
+  font-size: 16px;
+  font-weight: var(--font-weight-bold);
+  border: 2px solid var(--color-point);
+  border-radius: 100px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: -0.01em;
+}
+
+.cta-button:hover {
+  background-color: var(--color-point);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(59, 59, 59, 0.12);
+}
+
+/* Contact 섹션 - Editorial Style */
 .contact-section {
   background-color: var(--color-sub-main-1);
-  padding: var(--spacing-xl) var(--spacing-md);
+  padding: 100px var(--spacing-md);
   max-width: none;
   margin: 0;
 }
 
 .contact-section h2 {
-  font-size: 44px;
+  font-size: 40px;
   font-weight: var(--font-weight-bold);
   color: var(--color-point);
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: 32px;
   max-width: var(--max-width);
   margin-left: auto;
   margin-right: auto;
+  letter-spacing: -0.01em;
 }
 
 .contact-content {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: 20px;
   max-width: var(--max-width);
   margin-left: auto;
   margin-right: auto;
@@ -344,24 +358,27 @@ section {
 .contact-description {
   font-size: 16px;
   color: var(--color-text-light);
-  line-height: 1.6;
-  margin-bottom: var(--spacing-xs);
+  line-height: 1.7;
+  margin-bottom: 0;
 }
 
 .contact-info {
-  font-size: 20px;
+  font-size: 18px;
   color: var(--color-text);
   line-height: 1.8;
 }
 
 .contact-info a {
   color: var(--color-point);
-  text-decoration: underline;
-  transition: color 0.3s ease;
+  text-decoration: none;
+  border-bottom: 1px solid var(--color-point);
+  transition: all 0.3s ease;
+  padding-bottom: 2px;
 }
 
 .contact-info a:hover {
   color: #2a2a2a;
+  border-bottom-color: #2a2a2a;
 }
 
 /* ==========================================
@@ -397,20 +414,32 @@ footer p {
   }
 
   .hero-section {
-    min-height: 380px;
+    min-height: 240px;
   }
 
   .hero-section h1 {
-    font-size: 44px;
+    font-size: 48px;
   }
 
   .hero-section p {
-    font-size: 18px;
+    font-size: 17px;
+  }
+
+  .work-section {
+    padding: 60px var(--spacing-md);
   }
 
   .work-section h2,
   .contact-section h2 {
     font-size: 36px;
+  }
+
+  .work-grid {
+    gap: 36px;
+  }
+
+  .contact-section {
+    padding: 80px var(--spacing-md);
   }
 }
 
@@ -442,24 +471,37 @@ footer p {
   }
 
   .hero-section {
-    min-height: 350px;
+    min-height: 200px;
   }
 
   .hero-content {
-    padding: var(--spacing-lg) var(--spacing-sm);
+    padding: 40px var(--spacing-sm);
   }
 
   .hero-section h1 {
-    font-size: 32px;
+    font-size: 36px;
   }
 
   .hero-section p {
     font-size: 16px;
   }
 
+  .work-section {
+    padding: 48px var(--spacing-sm);
+  }
+
   .work-section h2,
   .contact-section h2 {
-    font-size: 28px;
+    font-size: 32px;
+  }
+
+  .work-section > p {
+    font-size: 15px;
+    margin-bottom: 40px;
+  }
+
+  .contact-section {
+    padding: 60px var(--spacing-sm);
   }
 
   .contact-description {
