@@ -21,8 +21,17 @@ document.addEventListener('DOMContentLoaded', async function() {
   // 스크롤 시 헤더 스타일 변경
   initHeaderScroll();
 
-  // 작업물 카드 클릭 이벤트
-  initWorkCards();
+  // 작업물 카드 클릭 이벤트 (이벤트 위임 - 한 번만 등록)
+  const workGrid = document.getElementById('workGrid');
+  workGrid.addEventListener('click', async function(e) {
+    const card = e.target.closest('.work-card');
+    if (card) {
+      const postId = card.getAttribute('data-id');
+      if (postId) {
+        await openDetailModal(postId);
+      }
+    }
+  });
 
 });
 
@@ -73,22 +82,9 @@ function initHeaderScroll() {
 }
 
 // ==========================================
-// 작업물 카드 클릭 이벤트
+// 작업물 카드 클릭 이벤트 (이벤트 위임)
 // ==========================================
-function initWorkCards() {
-  const workCards = document.querySelectorAll('.work-card');
-
-  workCards.forEach(card => {
-    card.addEventListener('click', async function() {
-      const postId = this.getAttribute('data-id');
-
-      if (postId) {
-        // 메인페이지에서 상세보기 모달 열기
-        await openDetailModal(postId);
-      }
-    });
-  });
-}
+// 이벤트 위임은 DOMContentLoaded에서 한 번만 등록됨 (line 26-34)
 
 // ==========================================
 // 현재 섹션 감지 및 네비게이션 활성화
@@ -237,8 +233,7 @@ function displayWorkPosts(posts) {
     `;
   }).join('');
 
-  // 카드 클릭 이벤트 다시 초기화
-  initWorkCards();
+  // 카드 클릭 이벤트는 DOMContentLoaded에서 이미 등록됨 (이벤트 위임 방식)
 }
 
 // ==========================================
