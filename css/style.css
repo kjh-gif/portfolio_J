@@ -172,9 +172,9 @@ section {
   margin: 0 auto;
 }
 
-/* Hero 섹션 - Editorial Minimal Style */
+/* Hero 섹션 - Editorial Minimal Style with Hierarchy */
 .hero-section {
-  min-height: 280px;
+  min-height: auto;
   width: 100%;
   background: linear-gradient(135deg, #F7F2EF 0%, #DCD9CD 100%);
   position: relative;
@@ -193,7 +193,7 @@ section {
 .hero-content {
   max-width: var(--max-width);
   width: 100%;
-  padding: 60px var(--spacing-md);
+  padding: 100px var(--spacing-md);
   position: relative;
   z-index: 2;
   display: flex;
@@ -201,25 +201,35 @@ section {
   align-items: flex-start;
 }
 
-.hero-section h1 {
+/* Hero Eyebrow */
+.hero-eyebrow {
+  font-size: 14px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 20px;
+}
+
+/* Hero Headline */
+.hero-headline {
   font-size: 56px;
   font-weight: var(--font-weight-bold);
   color: var(--color-point);
-  margin-bottom: 20px;
-  line-height: 1.1;
+  margin-bottom: 24px;
+  line-height: 1.15;
   letter-spacing: -0.02em;
+  max-width: 900px;
 }
 
-.hero-section p {
+/* Hero Sub Copy */
+.hero-subcopy {
   font-size: 18px;
   color: var(--color-text);
   margin-bottom: 0;
   line-height: 1.7;
   font-weight: 400;
-}
-
-.hero-section .cta-button {
-  display: none;
+  max-width: 600px;
 }
 
 /* Work 섹션 - Editorial 2-Column Layout */
@@ -326,45 +336,47 @@ section {
   box-shadow: 0 8px 20px rgba(59, 59, 59, 0.12);
 }
 
-/* Contact 섹션 - Editorial Style */
+/* Contact 섹션 - Hero와 동일한 스케일/위계 */
 .contact-section {
   background-color: var(--color-sub-main-1);
-  padding: 100px var(--spacing-md);
+  padding: 0;
   max-width: none;
   margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.contact-content {
+  max-width: var(--max-width);
+  width: 100%;
+  padding: 100px var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .contact-section h2 {
   font-size: 40px;
   font-weight: var(--font-weight-bold);
   color: var(--color-point);
-  margin-bottom: 32px;
-  max-width: var(--max-width);
-  margin-left: auto;
-  margin-right: auto;
+  margin-bottom: 24px;
   letter-spacing: -0.01em;
+  line-height: 1.2;
 }
 
-.contact-content {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  max-width: var(--max-width);
-  margin-left: auto;
-  margin-right: auto;
+.contact-info {
+  font-size: 18px;
+  color: var(--color-text);
+  line-height: 1.7;
+  margin-bottom: 12px;
 }
 
 .contact-description {
   font-size: 16px;
   color: var(--color-text-light);
   line-height: 1.7;
-  margin-bottom: 0;
-}
-
-.contact-info {
-  font-size: 18px;
-  color: var(--color-text);
-  line-height: 1.8;
+  margin-bottom: 12px;
 }
 
 .contact-info a {
@@ -412,15 +424,21 @@ footer p {
     --header-height: 70px;
   }
 
-  .hero-section {
-    min-height: 240px;
+  .hero-content {
+    padding: 80px var(--spacing-md);
   }
 
-  .hero-section h1 {
+  .hero-eyebrow {
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
+  .hero-headline {
     font-size: 48px;
+    margin-bottom: 20px;
   }
 
-  .hero-section p {
+  .hero-subcopy {
     font-size: 17px;
   }
 
@@ -428,8 +446,7 @@ footer p {
     padding: 60px var(--spacing-md);
   }
 
-  .work-section h2,
-  .contact-section h2 {
+  .work-section h2 {
     font-size: 36px;
   }
 
@@ -438,8 +455,12 @@ footer p {
     gap: 36px;
   }
 
-  .contact-section {
+  .contact-content {
     padding: 80px var(--spacing-md);
+  }
+
+  .contact-section h2 {
+    font-size: 36px;
   }
 }
 
@@ -470,19 +491,22 @@ footer p {
     font-size: 16px;
   }
 
-  .hero-section {
-    min-height: 200px;
-  }
-
   .hero-content {
-    padding: 40px var(--spacing-sm);
+    padding: 60px var(--spacing-sm);
   }
 
-  .hero-section h1 {
-    font-size: 36px;
+  .hero-eyebrow {
+    font-size: 12px;
+    margin-bottom: 12px;
   }
 
-  .hero-section p {
+  .hero-headline {
+    font-size: 32px;
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+
+  .hero-subcopy {
     font-size: 16px;
   }
 
@@ -490,8 +514,7 @@ footer p {
     padding: 48px var(--spacing-sm);
   }
 
-  .work-section h2,
-  .contact-section h2 {
+  .work-section h2 {
     font-size: 32px;
   }
 
@@ -500,12 +523,21 @@ footer p {
     margin-bottom: 40px;
   }
 
-  .contact-section {
+  .contact-content {
     padding: 60px var(--spacing-sm);
   }
 
+  .contact-section h2 {
+    font-size: 32px;
+    margin-bottom: 20px;
+  }
+
+  .contact-info {
+    font-size: 16px;
+  }
+
   .contact-description {
-    font-size: 14px;
+    font-size: 15px;
   }
 
   .work-grid,
