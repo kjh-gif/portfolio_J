@@ -108,17 +108,6 @@ header .header-container {
   align-items: center;
 }
 
-header .header-right {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-}
-
-header .header-container nav {
-  display: flex;
-  align-items: center;
-}
-
 header .logo {
   font-size: 24px;
   font-weight: var(--font-weight-bold);
@@ -336,47 +325,45 @@ section {
   box-shadow: 0 8px 20px rgba(59, 59, 59, 0.12);
 }
 
-/* Contact 섹션 - Hero와 동일한 스케일 */
+/* Contact 섹션 - Editorial Style */
 .contact-section {
   background-color: var(--color-sub-main-1);
-  padding: 0;
+  padding: 100px var(--spacing-md);
   max-width: none;
   margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.contact-content {
-  max-width: var(--max-width);
-  width: 100%;
-  padding: 100px var(--spacing-md);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
 }
 
 .contact-section h2 {
   font-size: 40px;
   font-weight: var(--font-weight-bold);
   color: var(--color-point);
-  margin-bottom: 24px;
+  margin-bottom: 32px;
+  max-width: var(--max-width);
+  margin-left: auto;
+  margin-right: auto;
   letter-spacing: -0.01em;
-  line-height: 1.2;
 }
 
-.contact-info {
-  font-size: 18px;
-  color: var(--color-text);
-  line-height: 1.7;
-  margin-bottom: 12px;
+.contact-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: var(--max-width);
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .contact-description {
   font-size: 16px;
   color: var(--color-text-light);
   line-height: 1.7;
-  margin-bottom: 12px;
+  margin-bottom: 0;
+}
+
+.contact-info {
+  font-size: 18px;
+  color: var(--color-text);
+  line-height: 1.8;
 }
 
 .contact-info a {
@@ -455,7 +442,7 @@ footer p {
     gap: 36px;
   }
 
-  .contact-content {
+  .contact-section {
     padding: 80px var(--spacing-md);
   }
 
@@ -523,21 +510,16 @@ footer p {
     margin-bottom: 40px;
   }
 
-  .contact-content {
+  .contact-section {
     padding: 60px var(--spacing-sm);
   }
 
   .contact-section h2 {
     font-size: 32px;
-    margin-bottom: 20px;
-  }
-
-  .contact-info {
-    font-size: 16px;
   }
 
   .contact-description {
-    font-size: 15px;
+    font-size: 14px;
   }
 
   .work-grid,
