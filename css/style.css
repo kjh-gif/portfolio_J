@@ -328,7 +328,7 @@ section {
 /* Contact 섹션 - Editorial Style */
 .contact-section {
   background-color: var(--color-sub-main-1);
-  padding: 100px var(--spacing-md);
+  padding: 67px var(--spacing-md);
   max-width: none;
   margin: 0;
 }
@@ -385,7 +385,7 @@ section {
 footer {
   background-color: var(--color-point);
   color: #ffffff;
-  padding: var(--spacing-lg) var(--spacing-md);
+  padding: 24px var(--spacing-md);
   text-align: center;
 }
 
@@ -443,7 +443,7 @@ footer p {
   }
 
   .contact-section {
-    padding: 80px var(--spacing-md);
+    padding: 53px var(--spacing-md);
   }
 
   .contact-section h2 {
@@ -511,7 +511,7 @@ footer p {
   }
 
   .contact-section {
-    padding: 60px var(--spacing-sm);
+    padding: 40px var(--spacing-sm);
   }
 
   .contact-section h2 {
