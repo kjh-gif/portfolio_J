@@ -328,7 +328,7 @@ section {
 /* Contact 섹션 - Editorial Style */
 .contact-section {
   background-color: var(--color-sub-main-1);
-  padding: 67px var(--spacing-md);
+  padding: 45px var(--spacing-md);
   max-width: none;
   margin: 0;
 }
@@ -443,7 +443,7 @@ footer p {
   }
 
   .contact-section {
-    padding: 53px var(--spacing-md);
+    padding: 35px var(--spacing-md);
   }
 
   .contact-section h2 {
@@ -511,7 +511,7 @@ footer p {
   }
 
   .contact-section {
-    padding: 40px var(--spacing-sm);
+    padding: 27px var(--spacing-sm);
   }
 
   .contact-section h2 {

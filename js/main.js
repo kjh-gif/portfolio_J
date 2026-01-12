@@ -260,13 +260,13 @@ async function openDetailModal(postId) {
   const detailContent = document.getElementById('detailContent');
   const detailAdminButtons = document.getElementById('detailAdminButtons');
 
-  // 1. 모달을 즉시 표시 (속도 개선 핵심)
-  detailModal.style.display = 'flex';
-
-  // 2. 로딩 상태 표시
-  detailTitle.textContent = '로딩 중...';
+  // 1. 이미지 영역 즉시 초기화 (중복 방지)
   detailImages.innerHTML = '';
+  detailTitle.textContent = '로딩 중...';
   detailContent.textContent = '';
+
+  // 2. 모달 표시
+  detailModal.style.display = 'flex';
 
   try {
     // 3. 캐시에서 먼저 찾기
