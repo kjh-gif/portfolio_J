@@ -238,7 +238,7 @@ function displayWorkPosts(posts) {
 
     return `
       <div class="work-card" data-id="${post.id}">
-        ${thumbnailUrl ? `<img src="${thumbnailUrl}" alt="${escapeHtml(post.title)}">` : ''}
+        ${thumbnailUrl ? `<img src="${thumbnailUrl}" alt="${escapeHtml(post.title)}" loading="lazy">` : ''}
         <div class="work-card-content">
           <h3>${escapeHtml(post.title)}</h3>
           <p>${escapeHtml(contentPreview)}</p>

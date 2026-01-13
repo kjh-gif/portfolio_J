@@ -312,7 +312,7 @@ function displayPosts(posts) {
 
     return `
       <div class="post-card" data-id="${post.id}">
-        ${thumbnailUrl ? `<img src="${thumbnailUrl}" alt="${escapeHtml(post.title)}">` : ''}
+        ${thumbnailUrl ? `<img src="${thumbnailUrl}" alt="${escapeHtml(post.title)}" loading="lazy">` : ''}
         <div class="post-card-content">
           <h3>${escapeHtml(post.title)}</h3>
           <p>${escapeHtml(contentPreview)}</p>

@@ -261,6 +261,7 @@ section {
   height: auto;
   display: flex;
   flex-direction: column;
+  will-change: transform;
 }
 
 .work-card:hover {
@@ -890,6 +891,7 @@ footer p {
   height: auto;
   display: flex;
   flex-direction: column;
+  will-change: transform;
 }
 
 .post-card:hover {
