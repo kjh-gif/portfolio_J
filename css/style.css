@@ -498,11 +498,6 @@ footer p {
   .search-box {
     max-width: 100%;
   }
-
-  /* 태블릿(960-1200px)에서 메인페이지 워크카드 4번째 표시 */
-  .work-grid .work-card:nth-child(4) {
-    display: flex;
-  }
 }
 
 /* 태블릿 중소형 (2열 그리드) */
@@ -511,6 +506,11 @@ footer p {
   .post-grid {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 32px;
+  }
+
+  /* 태블릿 중소형(769-959px)에서 메인페이지 워크카드 4번째 표시 */
+  .work-grid .work-card:nth-child(4) {
+    display: flex;
   }
 }
 
