@@ -272,9 +272,10 @@ section {
 .work-card img {
   width: 100%;
   height: 280px;
-  object-fit: cover;
+  object-fit: contain;
   flex-shrink: 0;
   display: block;
+  background-color: var(--color-sub-main-2);
 }
 
 .work-card-content {
@@ -401,7 +402,7 @@ footer p {
 ========================================== */
 
 /* 태블릿 */
-@media (max-width: 1024px) {
+@media (max-width: 1200px) {
   :root {
     --spacing-lg: 40px;
     --spacing-xl: 60px;
@@ -906,9 +907,10 @@ footer p {
 .post-card img {
   width: 100%;
   height: 280px;
-  object-fit: cover;
+  object-fit: contain;
   flex-shrink: 0;
   display: block;
+  background-color: var(--color-sub-main-2);
 }
 
 .post-card-content {
