@@ -499,6 +499,15 @@ footer p {
   }
 }
 
+/* 태블릿 중소형 (2열 그리드) */
+@media (max-width: 959px) and (min-width: 769px) {
+  .work-grid,
+  .post-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+  }
+}
+
 /* 모바일 */
 @media (max-width: 768px) {
   :root {
