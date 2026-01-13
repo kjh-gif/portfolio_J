@@ -281,47 +281,36 @@ async function openDetailModal(postId) {
   detailContent.textContent = '';
 
   try {
-    // 3. 조회수 증가
+    // 3. DB에서 최신 게시글 데이터 가져오기
+    const { data: post, error } = await supabaseClient
+      .from('posts')
+      .select('*')
+      .eq('id', postId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching post:', error);
+      detailModal.style.display = 'none';
+      alert('게시글을 불러오는데 실패했습니다.');
+      return;
+    }
+
+    // 4. 조회수 증가
+    const newViews = (post.views || 0) + 1;
     await supabaseClient
       .from('posts')
-      .update({ views: supabaseClient.raw('views + 1') })
+      .update({ views: newViews })
       .eq('id', postId);
 
-    // 4. 캐시에서 먼저 찾기
-    let post = cachedPosts.find(p => p.id === postId);
+    // 조회수 업데이트 (로컬)
+    post.views = newViews;
 
-    // 캐시에 없으면 DB에서 가져오기
-    if (!post) {
-      const { data, error } = await supabaseClient
-        .from('posts')
-        .select('*')
-        .eq('id', postId)
-        .single();
-
-      if (error) {
-        console.error('Error fetching post:', error);
-        detailModal.style.display = 'none';
-        alert('게시글을 불러오는데 실패했습니다.');
-        return;
-      }
-
-      post = data;
+    // 캐시 업데이트
+    const index = cachedPosts.findIndex(p => p.id === postId);
+    if (index !== -1) {
+      cachedPosts[index] = post;
     } else {
-      // 캐시에 있으면 최신 데이터를 다시 가져오기 (조회수 반영)
-      const { data, error } = await supabaseClient
-        .from('posts')
-        .select('*')
-        .eq('id', postId)
-        .single();
-
-      if (!error && data) {
-        post = data;
-        // 캐시 업데이트
-        const index = cachedPosts.findIndex(p => p.id === postId);
-        if (index !== -1) {
-          cachedPosts[index] = post;
-        }
-      }
+      cachedPosts.push(post);
     }
 
     // 5. 데이터로 내용 채우기
