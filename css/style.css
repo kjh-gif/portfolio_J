@@ -604,7 +604,12 @@ footer p {
   .work-grid,
   .post-grid {
     grid-template-columns: 1fr !important;
-    gap: 24px;
+    gap: 24px !important;
+  }
+
+  /* 모바일에서 post-grid 1열 강제 */
+  .post-grid.post-grid {
+    grid-template-columns: 1fr !important;
   }
 
   .work-card img,
