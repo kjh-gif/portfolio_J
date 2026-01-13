@@ -16,6 +16,16 @@ document.addEventListener('DOMContentLoaded', async function() {
   // UI 요소
   const searchBtn = document.getElementById('searchBtn');
   const searchInput = document.getElementById('searchInput');
+  const writeBtn = document.getElementById('writeBtn');
+
+  // 로그인 상태 확인 후 Write 버튼 표시
+  const isLoggedIn = await checkAuth();
+  if (isLoggedIn && writeBtn) {
+    writeBtn.style.display = 'inline-block';
+    writeBtn.addEventListener('click', function() {
+      window.location.href = 'admin.html';
+    });
+  }
 
   // 게시글 목록 로드
   await loadPosts();
