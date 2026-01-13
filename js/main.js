@@ -233,10 +233,8 @@ function displayWorkPosts(posts) {
       thumbnailUrl = imageUrls.length > 0 ? imageUrls[0] : null;
     }
 
-    // 내용 미리보기 (30자로 제한)
-    const contentPreview = post.content.length > 30
-      ? post.content.substring(0, 30) + '...'
-      : post.content;
+    // 내용 전체 표시
+    const contentPreview = post.content;
 
     return `
       <div class="work-card" data-id="${post.id}">

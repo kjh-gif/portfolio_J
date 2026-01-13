@@ -273,7 +273,7 @@ section {
   height: 280px;
   object-fit: contain;
   flex-shrink: 0;
-  background-color: #f9f9f9;
+  background-color: var(--color-sub-main-2);
 }
 
 .work-card-content {
@@ -827,7 +827,7 @@ footer p {
   height: 280px;
   object-fit: contain;
   flex-shrink: 0;
-  background-color: #f9f9f9;
+  background-color: var(--color-sub-main-2);
 }
 
 .post-card-content {
