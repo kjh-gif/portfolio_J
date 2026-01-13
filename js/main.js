@@ -211,8 +211,8 @@ function displayWorkPosts(posts) {
     return;
   }
 
-  // 메인 페이지에서는 최대 3개만 표시
-  const limitedPosts = posts.slice(0, 3);
+  // 메인 페이지에서는 최대 4개까지 표시 (태블릿 대응)
+  const limitedPosts = posts.slice(0, 4);
 
   workGrid.innerHTML = limitedPosts.map(post => {
     // 썸네일 또는 첫 번째 이미지 사용

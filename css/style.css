@@ -311,6 +311,11 @@ section {
   text-overflow: ellipsis;
 }
 
+/* 웹(1201px 이상)에서 메인페이지 워크카드 4번째 숨김 */
+.work-grid .work-card:nth-child(4) {
+  display: none;
+}
+
 /* CTA 버튼 - Editorial Style */
 .cta-button {
   display: inline-block;
@@ -492,6 +497,11 @@ footer p {
 
   .search-box {
     max-width: 100%;
+  }
+
+  /* 태블릿(960-1200px)에서 메인페이지 워크카드 4번째 표시 */
+  .work-grid .work-card:nth-child(4) {
+    display: flex;
   }
 }
 
