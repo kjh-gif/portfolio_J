@@ -136,7 +136,6 @@ highlightNavigation();
 // 로그인 상태에 따른 UI 업데이트
 // ==========================================
 async function updateAuthUI() {
-  const loginLink = document.getElementById('loginLink');
   const logoutBtn = document.getElementById('logoutBtn');
 
   // 로그인 상태 확인 (전역 변수에 캐시 - 속도 개선)
@@ -144,12 +143,10 @@ async function updateAuthUI() {
   isUserLoggedIn = isLoggedIn; // 전역 변수에 저장
 
   if (isLoggedIn) {
-    // 로그인 상태: 로그아웃 버튼 표시, 로그인 링크 숨김
-    if (loginLink) loginLink.style.display = 'none';
-    if (logoutBtn) logoutBtn.style.display = 'block';
+    // 로그인 상태: 로그아웃 버튼 표시 (푸터에)
+    if (logoutBtn) logoutBtn.style.display = 'inline';
   } else {
-    // 비로그인 상태: 로그인 링크 표시, 로그아웃 버튼 숨김
-    if (loginLink) loginLink.style.display = 'block';
+    // 비로그인 상태: 로그아웃 버튼 숨김
     if (logoutBtn) logoutBtn.style.display = 'none';
   }
 
@@ -204,7 +201,7 @@ async function loadWorkPosts() {
 }
 
 // ==========================================
-// 게시글 화면에 표시 (메인 페이지용)
+// 게시글 화면에 표시 (메인 페이지용 - 최대 3개만 표시)
 // ==========================================
 function displayWorkPosts(posts) {
   const workGrid = document.getElementById('workGrid');
@@ -214,7 +211,10 @@ function displayWorkPosts(posts) {
     return;
   }
 
-  workGrid.innerHTML = posts.map(post => {
+  // 메인 페이지에서는 최대 3개만 표시
+  const limitedPosts = posts.slice(0, 3);
+
+  workGrid.innerHTML = limitedPosts.map(post => {
     // 썸네일 또는 첫 번째 이미지 사용
     let thumbnailUrl = post.thumbnail_url;
 

@@ -17,14 +17,38 @@ document.addEventListener('DOMContentLoaded', async function() {
   const searchBtn = document.getElementById('searchBtn');
   const searchInput = document.getElementById('searchInput');
   const writeBtn = document.getElementById('writeBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
 
-  // 로그인 상태 확인 후 Write 버튼 표시
+  // 로그인 상태 확인 후 Write 버튼 및 로그아웃 버튼 표시
   const isLoggedIn = await checkAuth();
-  if (isLoggedIn && writeBtn) {
-    writeBtn.style.display = 'inline-block';
-    writeBtn.addEventListener('click', function() {
-      window.location.href = 'admin.html';
-    });
+  if (isLoggedIn) {
+    // Write 버튼 표시
+    if (writeBtn) {
+      writeBtn.style.display = 'inline-block';
+      writeBtn.addEventListener('click', function() {
+        window.location.href = 'admin.html';
+      });
+    }
+
+    // 로그아웃 버튼 표시 (푸터에)
+    if (logoutBtn) {
+      logoutBtn.style.display = 'inline';
+      logoutBtn.addEventListener('click', async function() {
+        try {
+          const { error } = await supabaseClient.auth.signOut();
+          if (error) {
+            console.error('Logout error:', error);
+            alert('로그아웃에 실패했습니다.');
+            return;
+          }
+          alert('로그아웃되었습니다.');
+          window.location.reload();
+        } catch (err) {
+          console.error('Error:', err);
+          alert('오류가 발생했습니다.');
+        }
+      });
+    }
   }
 
   // 게시글 목록 로드
