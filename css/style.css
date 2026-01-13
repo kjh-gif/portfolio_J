@@ -271,8 +271,9 @@ section {
 
 .work-card img {
   width: 100%;
-  height: 210px;
+  aspect-ratio: 16 / 10;
   object-fit: cover;
+  object-position: center;
   flex-shrink: 0;
   display: block;
 }
@@ -449,8 +450,9 @@ footer p {
 
   .work-card img,
   .post-card img {
-    height: 190px !important;
+    aspect-ratio: 16 / 10 !important;
     object-fit: cover !important;
+    object-position: center !important;
   }
 
   .work-card-content,
@@ -574,8 +576,9 @@ footer p {
 
   .work-card img,
   .post-card img {
-    height: 170px !important;
+    aspect-ratio: 16 / 10 !important;
     object-fit: cover !important;
+    object-position: center !important;
   }
 
   .work-card-content,
@@ -933,8 +936,9 @@ footer p {
 
 .post-card img {
   width: 100%;
-  height: 210px;
+  aspect-ratio: 16 / 10;
   object-fit: cover;
+  object-position: center;
   flex-shrink: 0;
   display: block;
 }
