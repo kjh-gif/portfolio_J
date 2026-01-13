@@ -506,14 +506,6 @@ footer p {
   }
 }
 
-/* 웹 (1201px 이상) */
-@media (min-width: 1201px) {
-  .work-grid,
-  .post-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
 /* 태블릿 중소형 (2열 그리드) */
 @media (min-width: 769px) and (max-width: 959px) {
   .work-grid,
@@ -611,8 +603,8 @@ footer p {
 
   .work-grid,
   .post-grid {
-    grid-template-columns: 1fr;
-    gap: 24px;
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
   }
 
   .work-card img,
@@ -954,6 +946,7 @@ footer p {
   padding: 0 var(--spacing-md);
   padding-top: var(--spacing-md);
   display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 40px;
 }
 
