@@ -281,7 +281,13 @@ async function openDetailModal(postId) {
   detailContent.textContent = '';
 
   try {
-    // 3. 캐시에서 먼저 찾기
+    // 3. 조회수 증가
+    await supabaseClient
+      .from('posts')
+      .update({ views: supabaseClient.raw('views + 1') })
+      .eq('id', postId);
+
+    // 4. 캐시에서 먼저 찾기
     let post = cachedPosts.find(p => p.id === postId);
 
     // 캐시에 없으면 DB에서 가져오기
@@ -300,10 +306,32 @@ async function openDetailModal(postId) {
       }
 
       post = data;
+    } else {
+      // 캐시에 있으면 최신 데이터를 다시 가져오기 (조회수 반영)
+      const { data, error } = await supabaseClient
+        .from('posts')
+        .select('*')
+        .eq('id', postId)
+        .single();
+
+      if (!error && data) {
+        post = data;
+        // 캐시 업데이트
+        const index = cachedPosts.findIndex(p => p.id === postId);
+        if (index !== -1) {
+          cachedPosts[index] = post;
+        }
+      }
     }
 
-    // 4. 데이터로 내용 채우기
-    detailTitle.textContent = post.title;
+    // 5. 데이터로 내용 채우기
+    detailTitle.innerHTML = escapeHtml(post.title);
+
+    // 관리자일 때만 조회수 표시
+    const isLoggedIn = await checkAuth();
+    if (isLoggedIn && post.views !== undefined) {
+      detailTitle.innerHTML += `<div style="font-size: 14px; color: #999; font-weight: normal; margin-top: 8px;">조회수: ${post.views}</div>`;
+    }
 
     // 이미지들 표시 (위에서 아래로) - 즉시 표시 방식
     if (post.image_url) {
