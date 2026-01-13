@@ -298,7 +298,7 @@ section {
 }
 
 .work-card p {
-  font-size: 16px;
+  font-size: 15px;
   color: var(--color-text-light);
   line-height: 1.5;
 }
@@ -443,20 +443,26 @@ footer p {
 
   .work-card img,
   .post-card img {
-    height: 240px !important;
+    height: 200px !important;
     object-fit: contain !important;
     object-position: top !important;
     background-color: var(--color-sub-main-2) !important;
   }
 
+  .work-card-content,
+  .post-card-content {
+    padding: 20px !important;
+  }
+
   .work-card h3,
   .post-card h3 {
-    font-size: 19px;
+    font-size: 20px !important;
+    margin-bottom: 8px !important;
   }
 
   .work-card p,
   .post-card p {
-    font-size: 15px;
+    font-size: 15px !important;
   }
 
   .contact-section {
@@ -556,7 +562,7 @@ footer p {
 
   .work-card img,
   .post-card img {
-    height: 220px !important;
+    height: 180px !important;
     object-fit: contain !important;
     object-position: top !important;
     background-color: var(--color-sub-main-2) !important;
@@ -564,18 +570,18 @@ footer p {
 
   .work-card-content,
   .post-card-content {
-    padding: 16px;
+    padding: 20px !important;
   }
 
   .work-card h3,
   .post-card h3 {
-    font-size: 18px;
-    margin-bottom: 6px;
+    font-size: 20px !important;
+    margin-bottom: 8px !important;
   }
 
   .work-card p,
   .post-card p {
-    font-size: 14px;
+    font-size: 15px !important;
   }
 
   .cta-button {
@@ -936,7 +942,7 @@ footer p {
 }
 
 .post-card p {
-  font-size: 16px;
+  font-size: 15px;
   color: var(--color-text-light);
   line-height: 1.5;
 }
