@@ -1316,7 +1316,7 @@ footer p {
 /* ===== FINAL: post-grid 전용 반응형 (board.html) ===== */
 
 /* 기본(웹/데스크탑 1201px+): 3열 + gap 40px */
-.post-grid {
+#postGrid.post-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 40px;
@@ -1324,7 +1324,7 @@ footer p {
 
 /* 태블릿 대형(960~1200px): 3열 + gap 32px */
 @media (min-width: 960px) and (max-width: 1200px) {
-  .post-grid {
+  #postGrid.post-grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 32px;
   }
@@ -1332,7 +1332,7 @@ footer p {
 
 /* 태블릿 중소형(769~959px): 2열 + gap 32px */
 @media (min-width: 769px) and (max-width: 959px) {
-  .post-grid {
+  #postGrid.post-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 32px;
   }
@@ -1340,8 +1340,8 @@ footer p {
 
 /* 모바일(<=768px): 1열 + gap 24px */
 @media (max-width: 768px) {
-  .post-grid {
-    grid-template-columns: 1fr;
-    gap: 24px;
+  #postGrid.post-grid {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
   }
 }
