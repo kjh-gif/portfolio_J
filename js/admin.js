@@ -533,11 +533,14 @@ async function openEditModal(postId) {
     postContent.value = post.content;
     currentEditingPostId = postId;
 
-    // 기존 썸네일 미리보기
+    // 기존 썸네일 미리보기 (삭제 버튼 포함)
     thumbnailPreview.innerHTML = '';
     if (post.thumbnail_url) {
       thumbnailPreview.innerHTML = `
-        <img src="${post.thumbnail_url}" alt="기존 썸네일" style="max-width: 200px; border-radius: 8px; margin-top: 12px;">
+        <div style="margin-top: 12px;">
+          <img src="${post.thumbnail_url}" alt="기존 썸네일" style="max-width: 200px; border-radius: 8px;">
+          <button type="button" class="btn-delete" onclick="deleteThumbnail('${postId}')" style="margin-top: 8px; display: block;">썸네일 삭제</button>
+        </div>
       `;
     }
 
@@ -845,6 +848,58 @@ async function uploadImages(files) {
     console.error('Error:', err);
     alert('이미지 업로드에 실패했습니다.');
     return [];
+  }
+}
+
+// ==========================================
+// 썸네일 삭제
+// ==========================================
+async function deleteThumbnail(postId) {
+  if (!confirm('썸네일을 삭제하시겠습니까?')) return;
+
+  try {
+    // 현재 게시글의 썸네일 URL 가져오기
+    const { data: post, error: fetchError } = await supabaseClient
+      .from('posts')
+      .select('thumbnail_url')
+      .eq('id', postId)
+      .single();
+
+    if (fetchError) {
+      console.error('Error fetching post:', fetchError);
+      alert('게시글을 불러오는데 실패했습니다.');
+      return;
+    }
+
+    if (!post.thumbnail_url) {
+      alert('삭제할 썸네일이 없습니다.');
+      return;
+    }
+
+    // Storage에서 썸네일 삭제
+    const thumbnailPath = post.thumbnail_url.split('/').pop();
+    await supabaseClient.storage
+      .from('post-images')
+      .remove([thumbnailPath]);
+
+    // DB에서 썸네일 URL 제거
+    const { error } = await supabaseClient
+      .from('posts')
+      .update({ thumbnail_url: null })
+      .eq('id', postId);
+
+    if (error) {
+      console.error('Error deleting thumbnail:', error);
+      alert('썸네일 삭제에 실패했습니다.');
+      return;
+    }
+
+    alert('썸네일이 삭제되었습니다.');
+    await openEditModal(postId);
+
+  } catch (err) {
+    console.error('Error:', err);
+    alert('오류가 발생했습니다.');
   }
 }
 
