@@ -1013,9 +1013,11 @@ footer p {
 }
 
 .close {
-  position: absolute;
+  position: sticky;
   top: 16px;
-  right: 16px;
+  float: right;
+  margin-top: -20px;
+  margin-right: -20px;
   font-size: 32px;
   color: var(--color-sub-point);
   cursor: pointer;
