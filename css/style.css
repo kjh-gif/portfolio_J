@@ -1199,6 +1199,10 @@ footer p {
     padding: 12px;
   }
 
+  .close {
+    margin-right: -20px;
+  }
+
   .pagination {
     flex-wrap: wrap;
     gap: 8px;
