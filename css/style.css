@@ -1216,12 +1216,14 @@ footer p {
 
   .pagination-btn {
     font-size: 13px;
-    padding: 8px 16px;
+    padding: 12px 20px;
+    min-height: 44px;
   }
 
   .page-number {
     font-size: 13px;
-    padding: 6px 12px;
+    padding: 12px 16px;
+    min-height: 44px;
   }
 }
 
