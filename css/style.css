@@ -442,6 +442,8 @@ footer p {
   .work-card img,
   .post-card img {
     height: 240px;
+    object-fit: contain;
+    background-color: var(--color-sub-main-2);
   }
 
   .work-card h3,
@@ -552,6 +554,8 @@ footer p {
   .work-card img,
   .post-card img {
     height: 220px;
+    object-fit: contain;
+    background-color: var(--color-sub-main-2);
   }
 
   .work-card-content,
