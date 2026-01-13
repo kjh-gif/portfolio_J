@@ -1144,15 +1144,15 @@ footer p {
 /* 반응형 - 게시판 */
 @media (max-width: 768px) {
   .board-container {
-    padding: var(--spacing-md) 0;
+    padding: var(--spacing-md) var(--spacing-sm);
   }
 
   .board-header {
-    padding: 0 var(--spacing-sm) var(--spacing-md);
+    padding: 0 0 var(--spacing-md);
   }
 
   .post-grid {
-    padding: 0 var(--spacing-sm);
+    padding: 0;
     padding-top: var(--spacing-md);
   }
 
