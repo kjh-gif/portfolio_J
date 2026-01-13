@@ -1318,15 +1318,17 @@ footer p {
     width: 100%;
   }
 }
-/* === FORCE: 모바일은 무조건 1열 === */
+
+/* === FINAL: board(work) 페이지 모바일은 무조건 1열 === */
 @media (max-width: 768px) {
-  .work-grid,
-  .post-grid {
+  body main.board-container section#postGrid.post-grid {
+    display: grid !important;
     grid-template-columns: 1fr !important;
     gap: 24px !important;
   }
-
-  .work-card {
+  body main.board-container section#postGrid.post-grid > .post-card {
     width: 100% !important;
+    max-width: 100% !important;
+    flex: none !important;
   }
 }
