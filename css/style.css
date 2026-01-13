@@ -499,7 +499,7 @@ footer p {
 @media (min-width: 769px) and (max-width: 959px) {
   .work-grid,
   .post-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr) !important;
     gap: 32px;
   }
 }
@@ -1166,11 +1166,6 @@ footer p {
     font-size: 13px;
     padding: 6px 12px;
     align-self: flex-end;
-  }
-
-  .post-grid {
-    grid-template-columns: 1fr;
-    gap: 24px;
   }
 
   .modal-content {
