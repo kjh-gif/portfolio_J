@@ -455,8 +455,7 @@ footer p {
     font-size: 36px;
   }
 
-  .work-grid,
-  .post-grid {
+  .work-grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 32px;
   }
@@ -508,8 +507,7 @@ footer p {
 
 /* 태블릿 중소형 (2열 그리드) */
 @media (min-width: 769px) and (max-width: 959px) {
-  .work-grid,
-  .post-grid {
+  .work-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 32px;
   }
@@ -601,8 +599,7 @@ footer p {
     font-size: 14px;
   }
 
-  .work-grid,
-  .post-grid {
+  .work-grid {
     grid-template-columns: 1fr;
     gap: 24px;
   }
@@ -939,15 +936,12 @@ footer p {
   background-color: #2a2a2a;
 }
 
-/* 게시글 그리드 */
+/* 게시글 그리드 (컬럼/gap은 FINAL 블록에서 관리) */
 .post-grid {
   max-width: var(--max-width);
   margin: 0 auto;
   padding: 0 var(--spacing-md);
   padding-top: var(--spacing-md);
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 40px;
 }
 
 .post-card {
@@ -1316,5 +1310,38 @@ footer p {
 
   .form-buttons button {
     width: 100%;
+  }
+}
+
+/* ===== FINAL: post-grid 전용 반응형 (board.html) ===== */
+
+/* 기본(웹/데스크탑 1201px+): 3열 + gap 40px */
+#postGrid.post-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+}
+
+/* 태블릿 대형(960~1200px): 3열 + gap 32px */
+@media (min-width: 960px) and (max-width: 1200px) {
+  #postGrid.post-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+}
+
+/* 태블릿 중소형(769~959px): 2열 + gap 32px */
+@media (min-width: 769px) and (max-width: 959px) {
+  #postGrid.post-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+  }
+}
+
+/* 모바일(<=768px): 1열 + gap 24px */
+@media (max-width: 768px) {
+  #postGrid.post-grid {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
   }
 }
