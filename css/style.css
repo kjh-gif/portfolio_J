@@ -271,15 +271,16 @@ section {
 
 .work-card img {
   width: 100%;
-  aspect-ratio: 16 / 10;
-  object-fit: cover;
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
   object-position: center;
   flex-shrink: 0;
   display: block;
+  background-color: var(--color-sub-main-2);
 }
 
 .work-card-content {
-  padding: 16px;
+  padding: 12px 16px 16px 16px;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -450,14 +451,15 @@ footer p {
 
   .work-card img,
   .post-card img {
-    aspect-ratio: 16 / 10 !important;
-    object-fit: cover !important;
+    aspect-ratio: 16 / 9 !important;
+    object-fit: contain !important;
     object-position: center !important;
+    background-color: var(--color-sub-main-2) !important;
   }
 
   .work-card-content,
   .post-card-content {
-    padding: 16px !important;
+    padding: 12px 16px 16px 16px !important;
   }
 
   .work-card h3,
@@ -576,14 +578,15 @@ footer p {
 
   .work-card img,
   .post-card img {
-    aspect-ratio: 16 / 10 !important;
-    object-fit: cover !important;
+    aspect-ratio: 16 / 9 !important;
+    object-fit: contain !important;
     object-position: center !important;
+    background-color: var(--color-sub-main-2) !important;
   }
 
   .work-card-content,
   .post-card-content {
-    padding: 16px !important;
+    padding: 12px 16px 16px 16px !important;
   }
 
   .work-card h3,
@@ -936,15 +939,16 @@ footer p {
 
 .post-card img {
   width: 100%;
-  aspect-ratio: 16 / 10;
-  object-fit: cover;
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
   object-position: center;
   flex-shrink: 0;
   display: block;
+  background-color: var(--color-sub-main-2);
 }
 
 .post-card-content {
-  padding: 16px;
+  padding: 12px 16px 16px 16px;
   flex: 1;
   display: flex;
   flex-direction: column;
