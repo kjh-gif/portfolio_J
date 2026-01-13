@@ -1318,3 +1318,15 @@ footer p {
     width: 100%;
   }
 }
+/* === FORCE: 모바일은 무조건 1열 === */
+@media (max-width: 768px) {
+  .work-grid,
+  .post-grid {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+
+  .work-card {
+    width: 100% !important;
+  }
+}
