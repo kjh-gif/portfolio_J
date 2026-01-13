@@ -443,7 +443,7 @@ footer p {
 
   .work-card img,
   .post-card img {
-    height: 200px !important;
+    height: 210px !important;
     object-fit: contain !important;
     object-position: top !important;
     background-color: var(--color-sub-main-2) !important;
@@ -451,7 +451,7 @@ footer p {
 
   .work-card-content,
   .post-card-content {
-    padding: 20px !important;
+    padding: 16px !important;
   }
 
   .work-card h3,
