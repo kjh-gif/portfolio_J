@@ -562,7 +562,7 @@ footer p {
 
   .work-card img,
   .post-card img {
-    height: 180px !important;
+    height: 240px !important;
     object-fit: contain !important;
     object-position: top !important;
     background-color: var(--color-sub-main-2) !important;
