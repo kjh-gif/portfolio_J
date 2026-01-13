@@ -421,8 +421,8 @@ footer p {
    반응형 디자인
 ========================================== */
 
-/* 태블릿 */
-@media (max-width: 1200px) {
+/* 태블릿 대형 */
+@media (min-width: 960px) and (max-width: 1200px) {
   :root {
     --spacing-lg: 40px;
     --spacing-xl: 60px;
