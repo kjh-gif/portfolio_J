@@ -1144,7 +1144,7 @@ footer p {
 /* 반응형 - 게시판 */
 @media (max-width: 768px) {
   .board-container {
-    padding: var(--spacing-md);
+    padding: var(--spacing-md) 0;
   }
 
   .board-header h1 {
