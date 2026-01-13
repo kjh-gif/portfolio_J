@@ -381,6 +381,85 @@ async function openDetailModal(postId) {
     // 내용 표시
     detailContent.textContent = post.content;
 
+    // 관리자일 때만 수정/삭제 버튼 표시
+    const detailAdminButtons = document.getElementById('detailAdminButtons');
+    if (detailAdminButtons) {
+      if (isLoggedIn) {
+        detailAdminButtons.style.display = 'flex';
+
+        // 수정 버튼 이벤트
+        const btnEditFromDetail = document.getElementById('btnEditFromDetail');
+        if (btnEditFromDetail) {
+          btnEditFromDetail.onclick = function() {
+            // admin.html의 수정 페이지로 이동
+            window.location.href = `admin.html#edit-${postId}`;
+          };
+        }
+
+        // 삭제 버튼 이벤트
+        const btnDeleteFromDetail = document.getElementById('btnDeleteFromDetail');
+        if (btnDeleteFromDetail) {
+          btnDeleteFromDetail.onclick = async function() {
+            if (!confirm('게시글을 삭제하시겠습니까?')) return;
+
+            try {
+              // 이미지가 있으면 Storage에서 삭제
+              if (post.image_url) {
+                let imageUrls = [];
+                if (typeof post.image_url === 'string') {
+                  try {
+                    imageUrls = JSON.parse(post.image_url);
+                  } catch {
+                    imageUrls = [post.image_url];
+                  }
+                } else if (Array.isArray(post.image_url)) {
+                  imageUrls = post.image_url;
+                }
+
+                // 모든 이미지 삭제
+                for (const url of imageUrls) {
+                  const imagePath = url.split('/').pop();
+                  await supabaseClient.storage
+                    .from('post-images')
+                    .remove([imagePath]);
+                }
+              }
+
+              // 썸네일 삭제
+              if (post.thumbnail_url) {
+                const thumbnailPath = post.thumbnail_url.split('/').pop();
+                await supabaseClient.storage
+                  .from('post-images')
+                  .remove([thumbnailPath]);
+              }
+
+              // 게시글 삭제
+              const { error } = await supabaseClient
+                .from('posts')
+                .delete()
+                .eq('id', postId);
+
+              if (error) {
+                console.error('Error deleting post:', error);
+                alert('게시글 삭제에 실패했습니다.');
+                return;
+              }
+
+              alert('게시글이 삭제되었습니다.');
+              detailModal.style.display = 'none';
+              await loadPosts();
+
+            } catch (err) {
+              console.error('Error:', err);
+              alert('오류가 발생했습니다.');
+            }
+          };
+        }
+      } else {
+        detailAdminButtons.style.display = 'none';
+      }
+    }
+
   } catch (err) {
     console.error('Error:', err);
     detailModal.style.display = 'none';

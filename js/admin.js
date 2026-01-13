@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
   });
 
-  // URL 해시가 있으면 해당 게시글 상세보기 열기
+  // URL 해시가 있으면 해당 게시글 상세보기/수정 모달 열기
   const hash = window.location.hash;
   if (hash && hash.startsWith('#post-')) {
     const postId = hash.replace('#post-', '');
@@ -212,6 +212,16 @@ document.addEventListener('DOMContentLoaded', async function() {
       // 페이지 로드 후 약간의 딜레이를 두고 모달 열기
       setTimeout(async () => {
         await openDetailModal(postId);
+      }, 500);
+    }
+  } else if (hash && hash.startsWith('#edit-')) {
+    // board.html에서 수정 버튼 클릭 시 이동
+    const postId = hash.replace('#edit-', '');
+    if (postId) {
+      setTimeout(async () => {
+        await openEditModal(postId);
+        // 해시 제거 (뒤로가기 시 다시 열리지 않도록)
+        history.replaceState(null, '', 'admin.html');
       }, 500);
     }
   }
@@ -734,20 +744,87 @@ async function handlePostSubmit() {
 }
 
 // ==========================================
-// 이미지 업로드 (여러 개)
+// 이미지 리사이즈 및 압축
+// ==========================================
+async function resizeImage(file, maxWidth = 1200, maxHeight = 1200, quality = 0.8) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+      const img = new Image();
+
+      img.onload = function() {
+        // 원본 크기가 제한보다 작으면 그대로 반환
+        if (img.width <= maxWidth && img.height <= maxHeight) {
+          // 하지만 PNG는 JPEG로 변환하여 용량 줄이기
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+
+          canvas.toBlob((blob) => {
+            resolve(blob);
+          }, 'image/jpeg', quality);
+          return;
+        }
+
+        // 비율 유지하며 리사이즈
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width;
+          width = maxWidth;
+        }
+
+        if (height > maxHeight) {
+          width = (width * maxHeight) / height;
+          height = maxHeight;
+        }
+
+        // Canvas로 리사이즈
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(width);
+        canvas.height = Math.round(height);
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        // JPEG로 변환 (압축)
+        canvas.toBlob((blob) => {
+          resolve(blob);
+        }, 'image/jpeg', quality);
+      };
+
+      img.src = e.target.result;
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
+// ==========================================
+// 이미지 업로드 (여러 개) - 자동 리사이즈 적용
 // ==========================================
 async function uploadImages(files) {
   try {
     const imageUrls = [];
 
     for (const file of files) {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+      // 이미지 리사이즈 및 압축
+      const resizedBlob = await resizeImage(file);
+
+      // 파일명 생성 (항상 .jpg 확장자)
+      const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.jpg`;
       const filePath = `${fileName}`;
 
       const { error } = await supabaseClient.storage
         .from('post-images')
-        .upload(filePath, file);
+        .upload(filePath, resizedBlob, {
+          contentType: 'image/jpeg'
+        });
 
       if (error) {
         console.error('Error uploading image:', error);

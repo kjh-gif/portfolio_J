@@ -381,16 +381,69 @@ async function openDetailModal(postId) {
     if (isUserLoggedIn) {
       detailAdminButtons.style.display = 'flex';
 
-      // 수정 버튼 클릭 시 board.html로 이동
+      // 수정 버튼 클릭 시 admin.html 수정 모달로 이동
       const btnEditFromDetail = document.getElementById('btnEditFromDetail');
       btnEditFromDetail.onclick = function() {
-        window.location.href = `board.html#post-${postId}`;
+        window.location.href = `admin.html#edit-${postId}`;
       };
 
-      // 삭제 버튼 - board.html로 이동
+      // 삭제 버튼 - 직접 삭제 처리
       const btnDeleteFromDetail = document.getElementById('btnDeleteFromDetail');
-      btnDeleteFromDetail.onclick = function() {
-        window.location.href = `board.html#post-${postId}`;
+      btnDeleteFromDetail.onclick = async function() {
+        if (!confirm('게시글을 삭제하시겠습니까?')) return;
+
+        try {
+          // 이미지가 있으면 Storage에서 삭제
+          if (post.image_url) {
+            let imageUrls = [];
+            if (typeof post.image_url === 'string') {
+              try {
+                imageUrls = JSON.parse(post.image_url);
+              } catch {
+                imageUrls = [post.image_url];
+              }
+            } else if (Array.isArray(post.image_url)) {
+              imageUrls = post.image_url;
+            }
+
+            for (const url of imageUrls) {
+              const imagePath = url.split('/').pop();
+              await supabaseClient.storage
+                .from('post-images')
+                .remove([imagePath]);
+            }
+          }
+
+          // 썸네일 삭제
+          if (post.thumbnail_url) {
+            const thumbnailPath = post.thumbnail_url.split('/').pop();
+            await supabaseClient.storage
+              .from('post-images')
+              .remove([thumbnailPath]);
+          }
+
+          // 게시글 삭제
+          const { error } = await supabaseClient
+            .from('posts')
+            .delete()
+            .eq('id', postId);
+
+          if (error) {
+            console.error('Error deleting post:', error);
+            alert('게시글 삭제에 실패했습니다.');
+            return;
+          }
+
+          alert('게시글이 삭제되었습니다.');
+          detailModal.style.display = 'none';
+
+          // Work 섹션 새로고침
+          await loadWorkPosts();
+
+        } catch (err) {
+          console.error('Error:', err);
+          alert('오류가 발생했습니다.');
+        }
       };
     } else {
       detailAdminButtons.style.display = 'none';
