@@ -603,7 +603,7 @@ footer p {
 
   .work-grid,
   .post-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
     gap: 24px;
   }
 
