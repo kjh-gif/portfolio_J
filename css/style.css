@@ -1014,12 +1014,18 @@ footer p {
 
 .close {
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: 16px;
+  right: 16px;
   font-size: 32px;
   color: var(--color-sub-point);
   cursor: pointer;
   transition: color 0.3s ease;
+  z-index: 9999;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .close:hover {
