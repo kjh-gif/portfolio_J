@@ -444,7 +444,8 @@ footer p {
     font-size: 36px;
   }
 
-  .work-grid {
+  .work-grid,
+  .post-grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 32px;
   }
@@ -487,11 +488,6 @@ footer p {
 
   .contact-section h2 {
     font-size: 36px;
-  }
-
-  .post-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 32px;
   }
 
   .search-box {
