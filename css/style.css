@@ -438,12 +438,36 @@ footer p {
     gap: 36px;
   }
 
+  .work-card img,
+  .post-card img {
+    height: 240px;
+  }
+
+  .work-card h3,
+  .post-card h3 {
+    font-size: 19px;
+  }
+
+  .work-card p,
+  .post-card p {
+    font-size: 15px;
+  }
+
   .contact-section {
     padding: 35px var(--spacing-md);
   }
 
   .contact-section h2 {
     font-size: 36px;
+  }
+
+  .post-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+  }
+
+  .search-box {
+    max-width: 100%;
   }
 }
 
@@ -521,10 +545,45 @@ footer p {
   .work-grid,
   .post-grid {
     grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .work-card img,
+  .post-card img {
+    height: 220px;
+  }
+
+  .work-card-content,
+  .post-card-content {
+    padding: 16px;
+  }
+
+  .work-card h3,
+  .post-card h3 {
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+
+  .work-card p,
+  .post-card p {
+    font-size: 14px;
+  }
+
+  .cta-button {
+    font-size: 15px;
+    padding: 12px 24px;
   }
 
   section {
     padding: var(--spacing-lg) var(--spacing-sm);
+  }
+
+  footer {
+    padding: 24px var(--spacing-sm);
+  }
+
+  .footer-container p {
+    font-size: 12px;
   }
 }
 
@@ -1000,13 +1059,37 @@ footer p {
 
 /* 반응형 - 게시판 */
 @media (max-width: 768px) {
+  .board-container {
+    padding: var(--spacing-md);
+  }
+
   .board-header h1 {
     font-size: 32px;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
+  }
+
+  .board-description {
+    font-size: 14px;
+    margin-bottom: var(--spacing-md);
   }
 
   .search-box {
     max-width: 100%;
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .search-box input {
+    width: 100%;
+    font-size: 14px;
+    padding: 10px 14px;
+  }
+
+  #searchBtn,
+  .btn-write {
+    width: 100%;
+    font-size: 14px;
+    padding: 10px 20px;
   }
 
   .search-row {
@@ -1021,21 +1104,41 @@ footer p {
     align-self: flex-end;
   }
 
-  .board-description {
-    font-size: 14px;
-    margin-bottom: var(--spacing-md);
-  }
-
   .post-grid {
     grid-template-columns: 1fr;
-  }
-
-  .search-box {
-    max-width: 100%;
+    gap: 24px;
   }
 
   .modal-content {
-    padding: var(--spacing-lg);
+    padding: var(--spacing-md);
+    width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .modal-content h2 {
+    font-size: 22px;
+  }
+
+  #detailImages {
+    margin: 16px 0 !important;
+  }
+
+  #detailContent {
+    font-size: 14px;
+    line-height: 1.5 !important;
+  }
+
+  .modal-buttons {
+    margin-top: 16px !important;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .modal-buttons button {
+    width: 100%;
+    font-size: 14px;
+    padding: 12px;
   }
 
   .pagination {
@@ -1044,12 +1147,83 @@ footer p {
   }
 
   .pagination-btn {
+    font-size: 13px;
     padding: 8px 16px;
-    font-size: 14px;
   }
 
   .page-number {
-    padding: 8px 12px;
+    font-size: 13px;
+    padding: 6px 12px;
+  }
+}
+
+/* 반응형 - 로그인 페이지 */
+@media (max-width: 768px) {
+  .login-container {
+    padding: var(--spacing-sm);
+  }
+
+  .login-box {
+    padding: var(--spacing-lg);
+  }
+
+  .login-box h1 {
+    font-size: 26px;
+  }
+
+  .login-box input {
     font-size: 14px;
+    padding: 12px 16px;
+  }
+
+  .login-box button {
+    font-size: 14px;
+    padding: 12px 20px;
+  }
+}
+
+/* 반응형 - Admin 페이지 */
+@media (max-width: 768px) {
+  .admin-container {
+    padding: var(--spacing-md);
+  }
+
+  .admin-header h1 {
+    font-size: 28px;
+  }
+
+  .form-group label {
+    font-size: 14px;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    font-size: 14px;
+    padding: 10px 14px;
+  }
+
+  .image-preview-container {
+    gap: 12px;
+  }
+
+  .image-preview {
+    width: 100%;
+    max-width: 150px;
+  }
+
+  .btn-submit,
+  .btn-cancel,
+  .btn-delete {
+    font-size: 14px;
+    padding: 12px 20px;
+  }
+
+  .form-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .form-buttons button {
+    width: 100%;
   }
 }
