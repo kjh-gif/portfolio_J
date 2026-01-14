@@ -54,6 +54,18 @@ document.addEventListener('DOMContentLoaded', async function() {
   // 게시글 목록 로드
   await loadPosts();
 
+  // 게시글 카드 클릭 이벤트 위임 (한 번만 등록)
+  const postGrid = document.getElementById('postGrid');
+  if (postGrid) {
+    postGrid.addEventListener('click', async function(e) {
+      const card = e.target.closest('.post-card');
+      if (card) {
+        const postId = card.getAttribute('data-id');
+        await handlePostCardClick(postId);
+      }
+    });
+  }
+
   // 검색 버튼 클릭
   if (searchBtn) {
     searchBtn.addEventListener('click', async function() {
@@ -236,15 +248,7 @@ function displayPosts(posts) {
       </div>
     `;
   }).join('');
-
-  // 카드 클릭 이벤트 (상세보기/수정)
-  const postCards = document.querySelectorAll('.post-card');
-  postCards.forEach(card => {
-    card.addEventListener('click', async function() {
-      const postId = this.getAttribute('data-id');
-      await handlePostCardClick(postId);
-    });
-  });
+  // 이벤트 리스너는 DOMContentLoaded에서 이벤트 위임으로 한 번만 등록됨
 }
 
 // ==========================================
