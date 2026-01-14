@@ -751,84 +751,31 @@ async function handlePostSubmit() {
 }
 
 // ==========================================
-// 이미지 리사이즈 및 압축
+// 이미지 처리 (원본 유지)
 // ==========================================
-async function resizeImage(file, maxWidth = 1600, maxHeight = 1600, quality = 0.92) {
-  return new Promise((resolve) => {
-    // 파일 타입 확인 (PNG는 PNG로 유지)
-    const isPNG = file.type === 'image/png';
-    const outputType = isPNG ? 'image/png' : 'image/jpeg';
-
-    const reader = new FileReader();
-
-    reader.onload = function(e) {
-      const img = new Image();
-
-      img.onload = function() {
-        // 원본 크기가 제한보다 작으면 원본 그대로 반환
-        if (img.width <= maxWidth && img.height <= maxHeight) {
-          resolve(file);
-          return;
-        }
-
-        // 비율 유지하며 리사이즈
-        let width = img.width;
-        let height = img.height;
-
-        if (width > maxWidth) {
-          height = (height * maxWidth) / width;
-          width = maxWidth;
-        }
-
-        if (height > maxHeight) {
-          width = (width * maxHeight) / height;
-          height = maxHeight;
-        }
-
-        // Canvas로 리사이즈
-        const canvas = document.createElement('canvas');
-        canvas.width = Math.round(width);
-        canvas.height = Math.round(height);
-
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-        // 원본 포맷 유지하여 변환
-        canvas.toBlob((blob) => {
-          resolve(blob);
-        }, outputType, isPNG ? undefined : quality);
-      };
-
-      img.src = e.target.result;
-    };
-
-    reader.readAsDataURL(file);
-  });
+async function resizeImage(file) {
+  // 원본 파일 그대로 반환 (품질 유지)
+  return file;
 }
 
 // ==========================================
-// 이미지 업로드 (여러 개) - 자동 리사이즈 적용
+// 이미지 업로드 (여러 개) - 원본 그대로 업로드
 // ==========================================
 async function uploadImages(files) {
   try {
     const imageUrls = [];
 
     for (const file of files) {
-      // 이미지 리사이즈 (필요한 경우만)
-      const resizedBlob = await resizeImage(file);
-
-      // 파일 타입에 맞는 확장자 사용
-      const isPNG = file.type === 'image/png';
-      const ext = isPNG ? 'png' : 'jpg';
-      const contentType = isPNG ? 'image/png' : 'image/jpeg';
-
-      const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${ext}`;
+      // 원본 파일 확장자 추출
+      const originalExt = file.name.split('.').pop().toLowerCase();
+      const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${originalExt}`;
       const filePath = `${fileName}`;
 
+      // 원본 파일 그대로 업로드
       const { error } = await supabaseClient.storage
         .from('post-images')
-        .upload(filePath, resizedBlob, {
-          contentType: contentType
+        .upload(filePath, file, {
+          contentType: file.type
         });
 
       if (error) {
